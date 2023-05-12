@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="lista_categorias_produtos">
+        <item>Artesanato</item>
+        <item>Castanhas</item>
+        <item>Doces</item>
+        <item>Frutas</item>
+        <item>Legumes</item>
+        <item>Mel</item>
+        <item>Remédios Caseiros</item>>
+        <item>Bebida</item>>
+        <item>Outros</item>>
+    </string-array>
+</resources>

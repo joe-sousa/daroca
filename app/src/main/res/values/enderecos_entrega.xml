@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="lista_enderecos_entrega">
+        <item>Sindicato dos Agricultores, Rua Coronel Lúcio, 303, Centro, Crateús - CE</item>
+        <item>Feira Agroecológica, R. Farias Brito, 188 - Centro, Crateús - CE</item>
+    </string-array>
+</resources>
