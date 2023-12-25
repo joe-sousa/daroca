@@ -4,14 +4,12 @@ import static com.example.daroca.activity.PrincipalClienteActivity.posicaoProdut
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,13 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.daroca.R;
 import com.example.daroca.activity.ItemPedidoActivity;
-import com.example.daroca.activity.PedidoActivity;
 import com.example.daroca.config.ConfiguracaoAuthFirebase;
-import com.example.daroca.helper.UsuarioFirebase;
 import com.example.daroca.model.ItemPedido;
 import com.example.daroca.model.Produto;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
@@ -42,14 +36,12 @@ public class ProdutoAdapterCliente extends RecyclerView.Adapter<ProdutoAdapterCl
     private DatabaseReference pedidoRef;
 
     ValueEventListener pedidoEventListener;
-    ItemPedido itemPedido;
 
-    final String[] idUser = {""};
+    ItemPedido itemPedido;
 
     public ProdutoAdapterCliente(List<Produto> vitrineProdutos) {
         this.produtos = vitrineProdutos;
     }
-    List<String> listProductors = new ArrayList<>();
 
     @NonNull
     @Override
@@ -79,38 +71,10 @@ public class ProdutoAdapterCliente extends RecyclerView.Adapter<ProdutoAdapterCl
 
     @Override
     public void onClick(View v) {
-        Produto produto = produtos.get(posicaoProduto);
-        String idProdutorDaListaDeProdutos = produto.getIdUsuario();
-        Log.i("msg", "idProdutor1" + idProdutorDaListaDeProdutos);
-
-        pedidoRef = firebaseRef.child("pedido")
-                .child(UsuarioFirebase.getIdentificadorUsuario())
-                .child("itemPedido");
-
-        pedidoEventListener = pedidoRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dados : snapshot.getChildren()){
-                    itemPedido = dados.getValue(ItemPedido.class);
-                    idUser[0] = itemPedido.getProduto().getIdUsuario();
-                }
-                Log.i("msg", "idProdutor2" + idUser[0]);
-                if(idProdutorDaListaDeProdutos.equals(idUser[0]) || idUser[0].isEmpty()){
-                    Intent intent = new Intent(context, ItemPedidoActivity.class);
-                    intent.putExtra("objeto", produto);
-                    context.startActivity(intent);
-                }else{
-                    Toast.makeText(context,
-                            "Favor escolha um produto que seja do mesmo produtor ou conclua pedido",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+            Produto produto = produtos.get(posicaoProduto);
+            Intent intent = new Intent(context, ItemPedidoActivity.class);
+            intent.putExtra("objeto1", produto);
+            context.startActivity(intent);
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -121,6 +85,7 @@ public class ProdutoAdapterCliente extends RecyclerView.Adapter<ProdutoAdapterCl
         private ImageView imageProduct;
         private Button like;
         private Button buy;
+        private TextView textView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -132,7 +97,7 @@ public class ProdutoAdapterCliente extends RecyclerView.Adapter<ProdutoAdapterCl
             imageProduct = itemView.findViewById(R.id.imageProdutoLayout);
             like = itemView.findViewById(R.id.buttonLikeProdutoLayout);
             buy = itemView.findViewById(R.id.buttonEditProdutoLayout);
+            textView = itemView.findViewById(R.id.textViewIdProdutorDaSacola);
         }
     }
-
 }

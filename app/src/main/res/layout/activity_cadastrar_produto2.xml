@@ -15,9 +15,11 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:paddingLeft="10dp"
-            android:paddingTop="25dp"
-            android:paddingEnd="10dp"
-            android:paddingRight="10dp">
+            android:paddingTop="5dp"
+            android:paddingEnd="5dp"
+            android:paddingRight="10dp"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="0dp">
 
             <TextView
                 android:id="@+id/textTiposRecebimento"
@@ -262,6 +264,32 @@
                     app:layout_constraintTop_toTopOf="@+id/imageViewFotoProduto"
                     app:layout_constraintVertical_bias="1.0"
                     tools:ignore="MissingConstraints" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="363dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="5dp"
+                    android:progressDrawable="@drawable/custom_progress_bar"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/imageViewFotoProduto" />
+
+                <TextView
+                    android:id="@+id/textProgress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="0%"
+                    android:textColor="#050505"
+                    android:textSize="15dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/progressBar" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
             <!--<ProgressBar
             android:id="@+id/progressBarUploadFoto"
@@ -276,6 +304,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
+                android:layout_marginBottom="20dp"
                 android:onClick="cadastrarProduto"
                 android:text="Cadastrar" />
 

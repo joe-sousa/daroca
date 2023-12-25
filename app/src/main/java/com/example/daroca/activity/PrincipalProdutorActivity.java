@@ -80,28 +80,6 @@ public class PrincipalProdutorActivity extends AppCompatActivity {
 
     }
 
-    /*public void cadastrarProduto(){
-        Produto produto1 = new Produto();
-        produto1.setNome("Banana");
-        produto1.setDescricao("Banana prata");
-        produto1.setFoto(R.drawable.banana);
-        produto1.setPreco(5);
-        produto1.setQuantidade(20);
-        produto1.setDescricao("Banana Doce");
-
-        produtos.add(produto1);
-
-        Produto produto2 = new Produto();
-        produto2.setNome("Doce");
-        produto2.setDescricao("Doce de leite");
-        produto2.setFoto(R.drawable.doce);
-        produto2.setPreco(3);
-        produto2.setQuantidade(15);
-        produto2.setDescricao("Doce caseiro");
-
-        produtos.add(produto2);
-    }*/
-
     public void listarProdutos() {
         String email = auth.getCurrentUser().getEmail();
         String idUser = Base64Custom.codificarBase(email);
@@ -114,7 +92,6 @@ public class PrincipalProdutorActivity extends AppCompatActivity {
                 for(DataSnapshot dados: snapshot.getChildren()){
                     Produto produto = dados.getValue(Produto.class);
                     produtos.add(produto);
-                    //Log.i("msg", produtos.toString());
                 }
                 postAdapter.notifyDataSetChanged();
             }

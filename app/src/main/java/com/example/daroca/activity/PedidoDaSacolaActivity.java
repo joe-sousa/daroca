@@ -34,11 +34,13 @@ public class PedidoDaSacolaActivity extends AppCompatActivity {
     ItemPedido itemPedido;
     private DatabaseReference firebaseRef = ConfiguracaoAuthFirebase.getFirebaseDatabase();
     private DatabaseReference pedidoRef1;
+    private DatabaseReference pedidoRef2;
     private DatabaseReference produtorRef;
     private ValueEventListener valueEventListenerItemPedido1;
-    private ValueEventListener valueEventListenerNomeProdutor;
+    private ValueEventListener valueEventListeneridProdutor;
     private Button criarNovo;
     private Button finalizarPedido;
+    boolean redirecionamentoFeito = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,15 +62,38 @@ public class PedidoDaSacolaActivity extends AppCompatActivity {
         criarNovo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PrincipalClienteActivity.class);
-                startActivity(intent);
+
+                pedidoRef2 = firebaseRef.child("pedido")
+                        .child(UsuarioFirebase.getIdentificadorUsuario())
+                        .child("itemPedido");
+
+                valueEventListeneridProdutor = pedidoRef2.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for(DataSnapshot dados: snapshot.getChildren()) {
+                            ItemPedido itemPedido = dados.getValue(ItemPedido.class);
+                            if(!redirecionamentoFeito){
+                                Intent intent = new Intent(getApplicationContext(), PrincipalClienteActivity.class);
+                                intent.putExtra("idProdutor3", itemPedido.getIdProdutor());
+                                startActivity(intent);
+                                redirecionamentoFeito = true;
+                            }
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
         finalizarPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PrincipalClienteActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ProdutoresActivity.class);
                 startActivity(intent);
             }
         });
@@ -85,23 +110,12 @@ public class PedidoDaSacolaActivity extends AppCompatActivity {
                 .child(UsuarioFirebase.getIdentificadorUsuario())
                 .child("itemPedido");
 
-        produtorRef = firebaseRef.child("usuario")
-                .child("produtor");
-
-        //Localiza todos os podutores cadastrados no nó para conseguir seus nomes
-        valueEventListenerNomeProdutor = produtorRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dados: snapshot.getChildren()) {
-                    Produtor produtor = dados.getValue(Produtor.class);
-                    //Localiza pedidos por nome do produtor
                     valueEventListenerItemPedido1 = pedidoRef1.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             for(DataSnapshot dados: snapshot.getChildren()) {
                                 ItemPedido itemPedido = dados.getValue(ItemPedido.class);
-                                if(itemPedido.getNomeProdutor().equals(produtor.getNome()))
-                                    listaPedidosSacola1.add(itemPedido);
+                                listaPedidosSacola1.add(itemPedido);
                             }
                             pedidoAdapter1.notifyDataSetChanged();
                         }
@@ -109,13 +123,7 @@ public class PedidoDaSacolaActivity extends AppCompatActivity {
                         public void onCancelled(@NonNull DatabaseError error) {
                         }
                     });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
     }
 }
+
+

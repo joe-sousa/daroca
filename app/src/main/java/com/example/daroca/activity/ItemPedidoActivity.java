@@ -1,11 +1,7 @@
 package com.example.daroca.activity;
 
-import static com.example.daroca.activity.PrincipalClienteActivity.posicaoProduto;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
+import android.media.audiofx.DynamicsProcessing;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +9,9 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.daroca.R;
 import com.example.daroca.config.ConfiguracaoAuthFirebase;
@@ -24,107 +23,62 @@ import com.example.daroca.model.Produtor;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-
-import java.io.Serializable;
 
 public class ItemPedidoActivity extends AppCompatActivity {
 
     Produto produto;
-    private TextView item_produto;
-    private TextView nomeProduto;
-    private TextView descricaoProduto;
-    private TextView precoProduto;
-    private TextView qtdProduto;
-    private ImageButton aumentar;
-    private ImageButton diminuir;
+    private TextView itemProdutoTextView;
+    private TextView nomeProdutoTextView;
+    private TextView descricaoProdutoTextView;
+    private TextView precoProdutoTextView;
+    private TextView qtdProdutoTextView;
+    private ImageButton aumentarButton;
+    private ImageButton diminuirButton;
     private Button avancarTelaPedidos;
-    private DatabaseReference firebaseRef = ConfiguracaoAuthFirebase.getFirebaseDatabase();
-    ValueEventListener valueEventListenerProdutorName;
+    private TextView textView;
+    private DatabaseReference firebaseRef;
     private DatabaseReference usuarioRef;
     private DatabaseReference produtorRef;
-
-    String nomeProdutor;
-    int quantidade = 0;
-    ItemPedido itemPedido;
-    static double total = 0;
+    private ItemPedido itemPedido;
+    private String idProdutor;
+    private int quantidade = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_pedido);
 
-        item_produto = findViewById(R.id.textTesteItemPedido);
-        nomeProduto = findViewById(R.id.textNome);
-        descricaoProduto = findViewById(R.id.textoDescricaoProd);
-        precoProduto = findViewById(R.id.textoPreco);
-        diminuir = findViewById(R.id.imageButtonDiminuirQtd);
-        aumentar = findViewById(R.id.imageButtonAumentarQtd);
-        qtdProduto = findViewById(R.id.idQuantidadeItensPedido);
-        avancarTelaPedidos = findViewById(R.id.buttonIncluirPedido);
+        firebaseRef = FirebaseDatabase.getInstance().getReference();
+
+        inicializandoAtributosDoItemPedido();
 
         produto = new Produto();
 
         Bundle dados = getIntent().getExtras();
-        //Recebendo dados do produto da PrincipalClienteActivity
-        Produto produtoEmCadastro = (Produto) dados.getSerializable("objeto");
-        produto.setNome(produtoEmCadastro.getNome());
-        produto.setDescricao(produtoEmCadastro.getDescricao());
-        produto.setPreco(produtoEmCadastro.getPreco());
-        produto.setIdUsuario(produtoEmCadastro.getIdUsuario());
+        if (dados != null) {
+            //Recebendo dados do produto da PrincipalClienteActivity através do ProdutorAdapterCliente.java
+            Produto produtoEmCadastro = (Produto) dados.getSerializable("objeto1");
+            produto = new Produto(produtoEmCadastro);
+        }
 
         String idUsuario = produto.getIdUsuario();
-        usuarioRef = firebaseRef.child("usuario")
-                .child("produtor")
-                .child(idUsuario);
 
-        usuarioRef.addValueEventListener(new ValueEventListener() {
+        inicializandoItemPedido(idUsuario);
+
+        aumentarButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Produtor produtor = snapshot.getValue(Produtor.class);
-                nomeProdutor = produtor.getNome();
-                nomeProduto.setText(produto.getNome());
-                descricaoProduto.setText(produto.getDescricao());
-                precoProduto.setText(String.valueOf(produto.getPreco()));
-                itemPedido = new ItemPedido();
-                itemPedido.setProduto(produto);
-                itemPedido.setNomeProdutor(nomeProdutor);
-                qtdProduto.setText(String.valueOf(itemPedido.getQuantidade()));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+            public void onClick(View v) {
+                incrementarQuantidade();
             }
         });
 
-        aumentar.setOnClickListener(new View.OnClickListener() {
+        diminuirButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ++quantidade;
-                if(quantidade < 1){
-                    Toast.makeText(ItemPedidoActivity.this,
-                            "Valor mínimo para quantidade é 1",
-                            Toast.LENGTH_SHORT).show();
-                }else{
-                    itemPedido.setQuantidade(quantidade);
-                }
-                qtdProduto.setText(String.valueOf(itemPedido.getQuantidade()));
-            }
-        });
-
-        diminuir.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(quantidade < 1){
-                    Toast.makeText(ItemPedidoActivity.this,
-                            "Valor mínimo para quantidade é 1",
-                            Toast.LENGTH_SHORT).show();
-                }else{
-                    --quantidade;
-                }
-                itemPedido.setQuantidade(quantidade);
-                qtdProduto.setText(String.valueOf(itemPedido.getQuantidade()));
+                decrementarQuantidade();
             }
         });
 
@@ -132,25 +86,85 @@ public class ItemPedidoActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             calcularPrecoxQtd();
-            Intent intent = new Intent(getApplicationContext(), PedidoActivity.class);
-            intent.putExtra("objeto", itemPedido.getProduto());
-            intent.putExtra("nomeProdutor", itemPedido.getNomeProdutor());
-            intent.putExtra("quantidade", itemPedido.getQuantidade());
-            startActivity(intent);
+            abrirPedidoActivity();
+            itemPedido.salvarItemPedido();
         }
     });
     }
 
+    private void inicializandoItemPedido(String idUsuario) {
+        nomeProdutoTextView.setText(produto.getNome());
+        descricaoProdutoTextView.setText(produto.getDescricao());
+        precoProdutoTextView.setText(String.valueOf(produto.getPreco()));
+        itemPedido = new ItemPedido();
+        itemPedido.setProduto(produto);
+        itemPedido.setIdProdutor(idUsuario);
+        qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
+    }
+
+    private void inicializandoAtributosDoItemPedido() {
+        itemProdutoTextView = findViewById(R.id.textTesteItemPedido);
+        nomeProdutoTextView = findViewById(R.id.textNome);
+        descricaoProdutoTextView = findViewById(R.id.textoDescricaoProd);
+        precoProdutoTextView = findViewById(R.id.textoPreco);
+        diminuirButton = findViewById(R.id.imageButtonDiminuirQtd);
+        aumentarButton = findViewById(R.id.imageButtonAumentarQtd);
+        qtdProdutoTextView = findViewById(R.id.idQuantidadeItensPedido);
+        avancarTelaPedidos = findViewById(R.id.buttonIncluirPedido);
+        textView = findViewById(R.id.textViewIdProdutorDaSacola);
+    }
+
+    private void abrirPedidoActivity() {
+        Log.i("abrirPedidoActivity", "Iniciando PedidoActivity");
+        Intent myIntent = new Intent(ItemPedidoActivity.this, PedidoActivity.class);
+        myIntent.putExtra("objeto2", itemPedido.getProduto());
+        myIntent.putExtra("idProdutor", itemPedido.getIdProdutor());
+        myIntent.putExtra("quantidade", itemPedido.getQuantidade());
+        try {
+            startActivity(myIntent);
+            Log.i("abrirPedidoActivity", "PedidoActivity iniciada com sucesso");
+        } catch (Exception e) {
+            Log.e("abrirPedidoActivity", "Erro ao iniciar PedidoActivity: " + e.getMessage());
+            e.printStackTrace();
+        }
+        //startActivity(myIntent);
+    }
+
+    private void decrementarQuantidade() {
+        if(quantidade < 1){
+            Toast.makeText(ItemPedidoActivity.this,
+                    "Valor mínimo para quantidade é 1",
+                    Toast.LENGTH_SHORT).show();
+        }else{
+            quantidade--;
+        }
+        itemPedido.setQuantidade(quantidade);
+        qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
+        calcularPrecoxQtd();
+    }
+
+    private void incrementarQuantidade() {
+        quantidade++;
+        if(quantidade < 1){
+            Toast.makeText(ItemPedidoActivity.this,
+                    "Valor mínimo para quantidade é 1",
+                    Toast.LENGTH_SHORT).show();
+        }else{
+            itemPedido.setQuantidade(quantidade);
+        }
+        qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
+        calcularPrecoxQtd();
+    }
+
     private void calcularValorTotal() {
-        total+=itemPedido.getValorPrecoXQtdItem();
+        double total = itemPedido.getValorPrecoXQtdItem();
         Log.i("msg", "valorFinal " + total);
         itemPedido.setValorTotal(total);
     }
 
     private void calcularPrecoxQtd() {
-        float precoxqtd = (float) (itemPedido.getQuantidade() * itemPedido.getProduto().getPreco());
+        double precoxqtd = itemPedido.getQuantidade() * itemPedido.getProduto().getPreco();
         itemPedido.setValorPrecoXQtdItem(precoxqtd);
         calcularValorTotal();
-        itemPedido.salvarItemPedido();
     }
 }

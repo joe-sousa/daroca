@@ -146,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.child(idUser).exists()){
-                        startActivity(new Intent(getApplicationContext(), PrincipalClienteActivity.class));
+                        startActivity(new Intent(getApplicationContext(), ProdutoresActivity.class));
                 }
             }
 

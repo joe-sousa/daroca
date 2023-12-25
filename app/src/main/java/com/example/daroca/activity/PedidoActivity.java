@@ -1,8 +1,16 @@
 package com.example.daroca.activity;
 
-import static com.example.daroca.R.id.buttonConcluirPedido;
 import static com.example.daroca.R.id.idRecyclerViewListaItensPedido;
-import static com.example.daroca.R.id.recyclerViewProdutosCliente;
+
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,37 +18,21 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.Toast;
-
 import com.example.daroca.R;
 import com.example.daroca.adapter.PedidoAdapter;
-import com.example.daroca.adapter.ProdutoAdapterCliente;
 import com.example.daroca.config.ConfiguracaoAuthFirebase;
 import com.example.daroca.helper.RecyclerTouchListener;
 import com.example.daroca.helper.UsuarioFirebase;
 import com.example.daroca.model.ItemPedido;
 import com.example.daroca.model.Pedido;
 import com.example.daroca.model.Produto;
-import com.example.daroca.model.Produtor;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.StorageReference;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class PedidoActivity extends AppCompatActivity {
@@ -51,13 +43,15 @@ public class PedidoActivity extends AppCompatActivity {
     ItemPedido itemPedido;
     private Button novoItem;
     private Button concluirPedido;
+    private TextView totalPedido;
 
-    Pedido pedido = new Pedido();
+    Pedido pedido;
     private DatabaseReference firebaseRef = ConfiguracaoAuthFirebase.getFirebaseDatabase();
     private DatabaseReference pedidoRef;
     private ValueEventListener valueEventListenerNomeProdutor;
     private DatabaseReference produtorRef;
     private ValueEventListener valueEventListenerItemPedido;
+    private DatabaseReference pedidoRef2;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -78,29 +72,51 @@ public class PedidoActivity extends AppCompatActivity {
         recyclerViewItensDoPedido.setAdapter(pedidoAdapter);
         novoItem = findViewById(R.id.buttonNovoPedido);
         concluirPedido = findViewById(R.id.buttonConcluirPedido);
+        pedido = new Pedido();
+
+        totalPedido = findViewById(R.id.textViewValorTotal);
+        pedidoRef2 = ConfiguracaoAuthFirebase.getFirebaseDatabase()
+                .child("pedido")
+                .child(UsuarioFirebase.getIdentificadorUsuario());
+        // Recuperar valor total do pedido do Firebase
+        pedidoRef2.child("valorTotal").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Double valorTotal = snapshot.getValue(Double.class);
+                    DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+                    String valorFormatado = decimalFormat.format(valorTotal);
+                    totalPedido.setText("R$ " + valorFormatado);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("PedidoAdapter", "Erro ao recuperar valor total do pedido: " + error.getMessage());
+            }
+        });
 
         Bundle dados = getIntent().getExtras();
         //Recebendo dados de ItemPedidoActivity
-        Produto produto = (Produto) dados.getSerializable("objeto");
+        Produto produto = (Produto) dados.getSerializable("objeto2");
         int qtd = dados.getInt("quantidade");
-        String nomeProdutor = dados.getString("nomeProdutor");
+        String idProdutor = dados.getString("idProdutor");
 
         itemPedido = new ItemPedido();
         itemPedido.setProduto(produto);
         itemPedido.setQuantidade(qtd);
-        itemPedido.setNomeProdutor(nomeProdutor);
+        itemPedido.setIdProdutor(idProdutor);
+        itemPedido.setValorPrecoXQtdItem(produto.getPreco() * produto.getQuantidade());
         itemPedido.getProduto().getNome();
         itemPedido.getProduto().getPreco();
-        itemPedido.getNomeProdutor();
-
-        //Calculando o valor total do pedido
-        //calcularTotal();
-        //Log.i("valorTotal", "valorPedido" + calcularTotal());
+        itemPedido.getIdProdutor();
 
         novoItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pedido.salvarValorTotal();
                 Intent intent = new Intent(getApplicationContext(), PrincipalClienteActivity.class);
+                intent.putExtra("idProdutor2", itemPedido.getIdProdutor());
                 startActivity(intent);
             }
         });
@@ -108,8 +124,7 @@ public class PedidoActivity extends AppCompatActivity {
         concluirPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(getApplicationContext(), PrincipalClienteActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ProdutoresActivity.class);
                 startActivity(intent);
             }
         });
@@ -149,10 +164,16 @@ public class PedidoActivity extends AppCompatActivity {
                 valueEventListenerItemPedido = pedidoRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        double total = 0;
+                        listaPedidos.clear();
                         for(DataSnapshot dados: snapshot.getChildren()) {
                             ItemPedido itemPedido = dados.getValue(ItemPedido.class);
                             listaPedidos.add(itemPedido);
+                            total += itemPedido.getValorPrecoXQtdItem(); // Adicionar o valor do item ao total
+                            Log.i("msg", "Pedidos " + listaPedidos);
                         }
+                        pedido.setValorTotal(total); // Atualizar o valor total do pedido
+                        pedido.salvarValorTotal(); // Salvar o valor total no Firebase
                         pedidoAdapter.notifyDataSetChanged();
                     }
                     @Override

@@ -3,10 +3,21 @@ package com.example.daroca.model;
 import com.example.daroca.config.ConfiguracaoAuthFirebase;
 import com.google.firebase.database.DatabaseReference;
 
-public class Produtor extends Usuario{
-    private String chavePix;
+import java.io.Serializable;
 
+public class Produtor extends Usuario implements Serializable {
+    private String chavePix;
     public Produtor() {
+    }
+
+    private String foto;
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 
     public String getChavePix() {

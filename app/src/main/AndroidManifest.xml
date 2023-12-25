@@ -20,6 +20,9 @@
         android:theme="@style/ThemeDaroca"
         tools:targetApi="31">
         <activity
+            android:name=".activity.ProdutoresActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.PedidoDaSacolaActivity"
             android:exported="false" />
         <activity

@@ -1,26 +1,16 @@
 package com.example.daroca.model;
 
-import android.app.usage.UsageEvents;
-
-import androidx.annotation.NonNull;
-
 import com.example.daroca.config.ConfiguracaoAuthFirebase;
 import com.example.daroca.helper.UsuarioFirebase;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.events.Event;
 
 import java.util.List;
 
 public class Pedido {
-
-    DatabaseReference pedidoRef;
-
-    DatabaseReference firebaseRef = ConfiguracaoAuthFirebase.getFirebaseDatabase();
-
-    ValueEventListener pedidoValueEventListener;
+    private DatabaseReference pedidoRef;
+    private List<ItemPedido> itensPedido;
+    private String idPedido;
 
     private List<ItemPedido> listaPedidos;
     private String formaEntrega;
@@ -50,5 +40,14 @@ public class Pedido {
 
     public void setFormaEntrega(String formaEntrega) {
         this.formaEntrega = formaEntrega;
+    }
+
+    public void salvarValorTotal() {
+        pedidoRef = ConfiguracaoAuthFirebase.getFirebaseDatabase()
+                .child("pedido")
+                .child(UsuarioFirebase.getIdentificadorUsuario());
+
+        pedidoRef.child("valorTotal")
+                .setValue(valorTotal);
     }
 }

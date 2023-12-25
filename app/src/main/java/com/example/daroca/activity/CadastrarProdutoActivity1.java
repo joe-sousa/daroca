@@ -45,7 +45,7 @@ public class CadastrarProdutoActivity1 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastrar_produto);
 
-        setTitle("Cadastro de produtos");
+        setTitle("Cadastro");
         setTitleColor(R.color.white);
 
         nome = findViewById(R.id.textInputEditTextNomeProduto);

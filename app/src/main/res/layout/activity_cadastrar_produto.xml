@@ -26,8 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Cadastro"
-            android:paddingBottom="40dp"
+            android:text="Cadastro de Produtos"
             android:textColor="@color/black"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -44,11 +43,11 @@
             android:id="@+id/textInputEditTextNomeProduto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="5dp"
-            android:paddingBottom="10dp"
             android:ems="10"
-            android:hint="Digite o nome"
-            android:inputType="text" />
+            android:hint="Digite o nome do produto"
+            android:inputType="text"
+            android:paddingTop="5dp"
+            android:paddingBottom="10dp" />
 
         <TextView
             android:id="@+id/textDescricaoProduto"
@@ -63,11 +62,11 @@
             android:id="@+id/textInputEditTextDescricaoProduto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="5dp"
-            android:paddingBottom="10dp"
             android:ems="10"
-            android:hint="Digite a descrição"
-            android:inputType="text"/>
+            android:hint="Digite a descrição do produto"
+            android:inputType="text"
+            android:paddingTop="5dp"
+            android:paddingBottom="10dp" />
 
         <TextView
             android:id="@+id/textCategoria"
@@ -126,7 +125,7 @@
             android:id="@+id/buttonPraTela2CadastroProduto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="20dp"
             android:onClick="avancarTela2CadastroProduto"
             android:text="Avançar" />
 

@@ -10,6 +10,13 @@ public class Produto implements Serializable {
     public Produto() {
     }
 
+    public Produto(Produto outroProduto) {
+        this.nome = outroProduto.getNome();
+        this.descricao = outroProduto.getDescricao();
+        this.preco = outroProduto.getPreco();
+        this.idUsuario = outroProduto.getIdUsuario();
+    }
+
     public Produto(String descricao, String nome, double preco, int quantidade, String categoria) {
         this.descricao = descricao;
         this.nome = nome;

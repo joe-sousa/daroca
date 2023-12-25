@@ -1,5 +1,6 @@
 package com.example.daroca.activity;
 
+import static com.example.daroca.R.id.produtorId;
 import static com.example.daroca.R.id.recyclerViewPostProduto;
 import static com.example.daroca.R.id.recyclerViewProdutosCliente;
 
@@ -31,6 +32,7 @@ import com.example.daroca.helper.UsuarioFirebase;
 import com.example.daroca.model.Cliente;
 import com.example.daroca.model.Produto;
 import com.example.daroca.model.Produtor;
+import com.example.daroca.model.Usuario;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,7 +48,6 @@ public class PrincipalClienteActivity extends AppCompatActivity {
     private FirebaseAuth auth = ConfiguracaoAuthFirebase.getFirebaseAutenticacao();
     private DatabaseReference firebaseRef = ConfiguracaoAuthFirebase.getFirebaseDatabase();
     private DatabaseReference produtoRef;
-
     private DatabaseReference usuarioRef;
     private ValueEventListener valueEventListenerProduto;
     private RecyclerView recyclerViewProduto;
@@ -54,6 +55,7 @@ public class PrincipalClienteActivity extends AppCompatActivity {
     ProdutoAdapterCliente produtoAdapterCliente;
     private List<String> listaUserId;
     String nomeCliente;
+    Usuario produtor;
 
     public static int posicaoProduto;
 
@@ -127,41 +129,56 @@ public class PrincipalClienteActivity extends AppCompatActivity {
     }
 
     public void listarProdutos() {
-         usuarioRef = firebaseRef.child("usuario")
-                .child("produtor");
+        produtor = new Produtor();
+        Bundle dados = getIntent().getExtras();
 
-         usuarioRef.addValueEventListener(new ValueEventListener() {
-             @Override
-             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                 for(DataSnapshot dados: snapshot.getChildren()){
-                     Produtor produtor = dados.getValue(Produtor.class);
-                     String idUser = produtor.getIdUsuario();
+        /*Recebendo id do produtor através do Bundle e ProdutorAdapter*/
+        String idProdutor = dados.getString("produtorId");
+        Log.i("msg", "idProdutor" + idProdutor);
 
-                     produtoRef = firebaseRef.child("produto")
-                             .child(idUser);
+        /*Recebendo id do produtor através do Bundle e ProdutorAdapter quando
+         optou por não esvaizar sacola e deseja finalizar pedido*/
+        String idProdutor4 = dados.getString("produtorId4");
+        Log.i("msg", "idProdutor4" + idProdutor4);
 
-                     valueEventListenerProduto = produtoRef.addValueEventListener(new ValueEventListener() {
-                         @Override
-                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                             for(DataSnapshot dados: snapshot.getChildren()){
-                                 Produto produto = dados.getValue(Produto.class);
-                                 produtos.add(produto);
-                             }
-                             produtoAdapterCliente.notifyDataSetChanged();
-                         }
+        /*Recebendo id do produtor através do Bundle e do PedidoActivity*/
+        String idProdutor2 = dados.getString("idProdutor2");
+        Log.i("msg", "idProdutor2" + idProdutor2);
 
-                         @Override
-                         public void onCancelled(@NonNull DatabaseError error) {
+        /*Recebendo id do produtor através do Bundle e do PedidoDaSacolaActivity*/
+        String idProdutor3 = dados.getString("idProdutor3");
+        Log.i("msg", "idProdutor3" + idProdutor3);
 
-                         }
-                     });
-                 }
-             }
+        /*Lógica que define de onde o Id do produtor virá, se do ProdutorAdapter ou
+        * do PedidoActivity para poder gerar lista de produtos por produtor*/
+        if(idProdutor != null){
+            produtoRef = firebaseRef.child("produto")
+                    .child(idProdutor);
+        }else if(idProdutor2 != null){
+            produtoRef = firebaseRef.child("produto")
+                    .child(idProdutor2);
+        }else if(idProdutor3 != null){
+            produtoRef = firebaseRef.child("produto")
+                    .child(idProdutor3);
+        }else if(idProdutor4 != null) {
+            produtoRef = firebaseRef.child("produto")
+                    .child(idProdutor4);
+        }
 
-             @Override
-             public void onCancelled(@NonNull DatabaseError error) {
+        valueEventListenerProduto = produtoRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dados: snapshot.getChildren()){
+                    Produto produto = dados.getValue(Produto.class);
+                    produtos.add(produto);
+                }
+                produtoAdapterCliente.notifyDataSetChanged();
+            }
 
-             }
-         });
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
