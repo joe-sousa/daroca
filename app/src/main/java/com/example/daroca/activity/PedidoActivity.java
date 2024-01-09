@@ -84,6 +84,7 @@ public class PedidoActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     Double valorTotal = snapshot.getValue(Double.class);
+                    Log.i("msg", "ValorTotalPedido " +valorTotal);
                     DecimalFormat decimalFormat = new DecimalFormat("#0.00");
                     String valorFormatado = decimalFormat.format(valorTotal);
                     totalPedido.setText("R$ " + valorFormatado);

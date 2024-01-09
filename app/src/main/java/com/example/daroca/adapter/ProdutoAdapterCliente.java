@@ -4,6 +4,7 @@ import static com.example.daroca.activity.PrincipalClienteActivity.posicaoProdut
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +75,7 @@ public class ProdutoAdapterCliente extends RecyclerView.Adapter<ProdutoAdapterCl
             Produto produto = produtos.get(posicaoProduto);
             Intent intent = new Intent(context, ItemPedidoActivity.class);
             intent.putExtra("objeto1", produto);
+            intent.putExtra("quantidade", produto.getQuantidade());
             context.startActivity(intent);
     }
 
@@ -97,7 +99,6 @@ public class ProdutoAdapterCliente extends RecyclerView.Adapter<ProdutoAdapterCl
             imageProduct = itemView.findViewById(R.id.imageProdutoLayout);
             like = itemView.findViewById(R.id.buttonLikeProdutoLayout);
             buy = itemView.findViewById(R.id.buttonEditProdutoLayout);
-            textView = itemView.findViewById(R.id.textViewIdProdutorDaSacola);
         }
     }
 }

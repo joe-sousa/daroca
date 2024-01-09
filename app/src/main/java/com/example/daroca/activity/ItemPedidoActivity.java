@@ -38,13 +38,15 @@ public class ItemPedidoActivity extends AppCompatActivity {
     private ImageButton aumentarButton;
     private ImageButton diminuirButton;
     private Button avancarTelaPedidos;
-    private TextView textView;
+    private TextView textViewValorTotal;
     private DatabaseReference firebaseRef;
     private DatabaseReference usuarioRef;
     private DatabaseReference produtorRef;
     private ItemPedido itemPedido;
-    private String idProdutor;
     private int quantidade = 0;
+    private int quantidadeProduto = 0;
+    private int qtd = 0;
+    private boolean flag = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +63,16 @@ public class ItemPedidoActivity extends AppCompatActivity {
         if (dados != null) {
             //Recebendo dados do produto da PrincipalClienteActivity através do ProdutorAdapterCliente.java
             Produto produtoEmCadastro = (Produto) dados.getSerializable("objeto1");
+            quantidadeProduto = dados.getInt("quantidade", 0);
             produto = new Produto(produtoEmCadastro);
+            Log.i("msg", "qtdProdutoNoItemPedido " + quantidadeProduto);
         }
 
         String idUsuario = produto.getIdUsuario();
 
         inicializandoItemPedido(idUsuario);
+        quantidade=quantidadeProduto;
+        calcularPrecoxQtd();
 
         aumentarButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,9 +91,15 @@ public class ItemPedidoActivity extends AppCompatActivity {
     avancarTelaPedidos.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            calcularPrecoxQtd();
-            abrirPedidoActivity();
-            itemPedido.salvarItemPedido();
+            if(quantidade > 0) {
+                itemPedido.salvarItemPedido();
+                abrirPedidoActivity();
+            }else{
+                Toast.makeText(ItemPedidoActivity.this,
+                        "A quantidade não pode ser menor ou igual a zero",
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     });
     }
@@ -99,7 +111,7 @@ public class ItemPedidoActivity extends AppCompatActivity {
         itemPedido = new ItemPedido();
         itemPedido.setProduto(produto);
         itemPedido.setIdProdutor(idUsuario);
-        qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
+        qtdProdutoTextView.setText(String.valueOf(quantidadeProduto));
     }
 
     private void inicializandoAtributosDoItemPedido() {
@@ -111,40 +123,47 @@ public class ItemPedidoActivity extends AppCompatActivity {
         aumentarButton = findViewById(R.id.imageButtonAumentarQtd);
         qtdProdutoTextView = findViewById(R.id.idQuantidadeItensPedido);
         avancarTelaPedidos = findViewById(R.id.buttonIncluirPedido);
-        textView = findViewById(R.id.textViewIdProdutorDaSacola);
+        textViewValorTotal = findViewById(R.id.valorTotalDoPedido);
     }
 
     private void abrirPedidoActivity() {
         Log.i("abrirPedidoActivity", "Iniciando PedidoActivity");
-        Intent myIntent = new Intent(ItemPedidoActivity.this, PedidoActivity.class);
-        myIntent.putExtra("objeto2", itemPedido.getProduto());
-        myIntent.putExtra("idProdutor", itemPedido.getIdProdutor());
-        myIntent.putExtra("quantidade", itemPedido.getQuantidade());
-        try {
-            startActivity(myIntent);
-            Log.i("abrirPedidoActivity", "PedidoActivity iniciada com sucesso");
-        } catch (Exception e) {
-            Log.e("abrirPedidoActivity", "Erro ao iniciar PedidoActivity: " + e.getMessage());
-            e.printStackTrace();
+        if (itemPedido != null && itemPedido.getProduto() != null && itemPedido.getIdProdutor() != null) {
+            Intent myIntent = new Intent(getApplicationContext(), PedidoActivity.class);
+            myIntent.putExtra("objeto2", itemPedido.getProduto());
+            myIntent.putExtra("idProdutor", itemPedido.getIdProdutor());
+            myIntent.putExtra("quantidade", itemPedido.getQuantidade());
+            try {
+                startActivity(myIntent);
+                Log.i("abrirPedidoActivity", "PedidoActivity iniciada com sucesso");
+            } catch (Exception e) {
+                Log.e("abrirPedidoActivity", "Erro ao iniciar PedidoActivity: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }else{
+            Log.e("abrirPedidoActivity", "Dados insuficientes para iniciar PedidoActivity");
+            // Adicione uma mensagem de log ou feedback para identificar o problema
+            Toast.makeText(ItemPedidoActivity.this, "Dados insuficientes para iniciar PedidoActivity", Toast.LENGTH_SHORT).show();
         }
-        //startActivity(myIntent);
+//        startActivity(myIntent);
     }
 
     private void decrementarQuantidade() {
-        if(quantidade < 1){
+        flag = false;
+        if(quantidade == 0){
             Toast.makeText(ItemPedidoActivity.this,
-                    "Valor mínimo para quantidade é 1",
+                    "Valor mínimo para quantidade é " + quantidadeProduto,
                     Toast.LENGTH_SHORT).show();
         }else{
-            quantidade--;
+            quantidade-=quantidadeProduto;
+            itemPedido.setQuantidade(quantidade);
+            qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
+            calcularPrecoxQtd();
         }
-        itemPedido.setQuantidade(quantidade);
-        qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
-        calcularPrecoxQtd();
     }
-
     private void incrementarQuantidade() {
-        quantidade++;
+        flag = true;
+        quantidade+=quantidadeProduto;
         if(quantidade < 1){
             Toast.makeText(ItemPedidoActivity.this,
                     "Valor mínimo para quantidade é 1",
@@ -152,18 +171,25 @@ public class ItemPedidoActivity extends AppCompatActivity {
         }else{
             itemPedido.setQuantidade(quantidade);
         }
-        qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
         calcularPrecoxQtd();
+            Log.i("msg", "Qtd " + itemPedido.getQuantidade());
+        qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
     }
 
     private void calcularValorTotal() {
         double total = itemPedido.getValorPrecoXQtdItem();
         Log.i("msg", "valorFinal " + total);
         itemPedido.setValorTotal(total);
+        textViewValorTotal.setText("Valor total do pedido - R$ " + String.valueOf(total));
     }
 
     private void calcularPrecoxQtd() {
-        double precoxqtd = itemPedido.getQuantidade() * itemPedido.getProduto().getPreco();
+        if(flag == true){
+            qtd++;
+        }else{
+            qtd--;
+        }
+        double precoxqtd = qtd * itemPedido.getProduto().getPreco();
         itemPedido.setValorPrecoXQtdItem(precoxqtd);
         calcularValorTotal();
     }
