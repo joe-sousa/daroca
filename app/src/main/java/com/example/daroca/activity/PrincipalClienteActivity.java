@@ -64,7 +64,6 @@ public class PrincipalClienteActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_cliente, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();

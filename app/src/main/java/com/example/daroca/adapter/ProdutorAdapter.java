@@ -158,9 +158,10 @@ public class ProdutorAdapter extends RecyclerView.Adapter<ProdutorAdapter.MyView
                 builder.setNegativeButton("Esvaziar sacola", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(context,
-                                "Esvaziaremos a sacola",
-                                Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context,
+//                                "Esvaziaremos a sacola",
+//                                Toast.LENGTH_SHORT).show();
+                        esvaziarSacola();
                     }
                 });
 
@@ -174,6 +175,36 @@ public class ProdutorAdapter extends RecyclerView.Adapter<ProdutorAdapter.MyView
             }
         });
     }
+
+    private void esvaziarSacola() {
+        String idUsuarioLogado = UsuarioFirebase.getIdentificadorUsuario();
+        Log.i("msg", "idLogado " + idUsuarioLogado);
+
+        DatabaseReference sacolaRef = firebase.child("pedido")
+                .child(idUsuarioLogado);
+
+        sacolaRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot pedidoSnapshot : snapshot.getChildren()) {
+                        pedidoSnapshot.getRef().removeValue();
+                    }
+                    Toast.makeText(context, "Sacola esvaziada", Toast.LENGTH_SHORT).show();
+                    sacolaRef.removeEventListener(this);
+                }else{
+                    Toast.makeText(context, "A sacola já está vazia", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
         private TextView productorName;
