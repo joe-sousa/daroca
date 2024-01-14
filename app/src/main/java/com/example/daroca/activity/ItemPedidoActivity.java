@@ -111,6 +111,7 @@ public class ItemPedidoActivity extends AppCompatActivity {
         itemPedido = new ItemPedido();
         itemPedido.setProduto(produto);
         itemPedido.setIdProdutor(idUsuario);
+        itemPedido.setQuantidade(quantidadeProduto);
         qtdProdutoTextView.setText(String.valueOf(quantidadeProduto));
     }
 
@@ -180,7 +181,7 @@ public class ItemPedidoActivity extends AppCompatActivity {
         double total = itemPedido.getValorPrecoXQtdItem();
         Log.i("msg", "valorFinal " + total);
         itemPedido.setValorTotal(total);
-        textViewValorTotal.setText("Valor total do pedido - R$ " + String.valueOf(total));
+        textViewValorTotal.setText(quantidade + " unidades por R$ " + String.valueOf(total));
     }
 
     private void calcularPrecoxQtd() {

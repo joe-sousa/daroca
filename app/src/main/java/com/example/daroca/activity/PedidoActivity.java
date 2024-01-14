@@ -75,27 +75,27 @@ public class PedidoActivity extends AppCompatActivity {
         pedido = new Pedido();
 
         totalPedido = findViewById(R.id.textViewValorTotal);
-        pedidoRef2 = ConfiguracaoAuthFirebase.getFirebaseDatabase()
-                .child("pedido")
-                .child(UsuarioFirebase.getIdentificadorUsuario());
-        // Recuperar valor total do pedido do Firebase
-        pedidoRef2.child("valorTotal").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Double valorTotal = snapshot.getValue(Double.class);
-                    Log.i("msg", "ValorTotalPedido " +valorTotal);
-                    DecimalFormat decimalFormat = new DecimalFormat("#0.00");
-                    String valorFormatado = decimalFormat.format(valorTotal);
-                    totalPedido.setText("R$ " + valorFormatado);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("PedidoAdapter", "Erro ao recuperar valor total do pedido: " + error.getMessage());
-            }
-        });
+//        pedidoRef2 = ConfiguracaoAuthFirebase.getFirebaseDatabase()
+//                .child("pedido")
+//                .child(UsuarioFirebase.getIdentificadorUsuario());
+//        // Recuperar valor total do pedido do Firebase
+//        pedidoRef2.child("valorTotal").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()) {
+//                    Double valorTotal = snapshot.getValue(Double.class);
+//                    Log.i("msg", "ValorTotalPedido " +valorTotal);
+//                    DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+//                    String valorFormatado = decimalFormat.format(valorTotal);
+//                    totalPedido.setText("R$ " + valorFormatado);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Log.e("PedidoAdapter", "Erro ao recuperar valor total do pedido: " + error.getMessage());
+//            }
+//        });
 
         Bundle dados = getIntent().getExtras();
         //Recebendo dados de ItemPedidoActivity
