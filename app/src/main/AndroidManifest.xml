@@ -3,71 +3,74 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="ExtraText">
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="true" />
+  <uses-feature
+      android:name="android.hardware.camera"
+      android:required="true" />
 
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.CAMERA" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <application
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/ThemeDaroca"
-        tools:targetApi="31">
-        <activity
-            android:name=".activity.ProdutoresActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.PedidoDaSacolaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.PedidoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.ItemPedidoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.CadastrarProdutoActivity1"
-            android:exported="false" />
-        <activity
-            android:name=".activity.CadastrarProdutoActivity2"
-            android:exported="false" />
-        <activity
-            android:name=".activity.PrincipalComercianteActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.PrincipalClienteActivity"
-            android:exported="false" />
-        <activity
-            android:name=".model.CategoriaUsuario"
-            android:exported="false" />
-        <activity
-            android:name=".activity.PrincipalProdutorActivity"
-            android:exported="false"
-            android:label="@string/title_activity_principal" />
-        <activity
-            android:name=".activity.CadastrarActivity"
-            android:exported="false"
-            android:theme="@style/ThemeDaroca.NoActionBar" />
-        <activity
-            android:name=".activity.MainActivity"
-            android:exported="false"
-            android:label="@string/title_activity_login" />
-        <activity
-            android:name=".activity.LoginActivity"
-            android:exported="true"
-            android:theme="@style/ThemeDaroca.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
+  <application
+      android:allowBackup="true"
+      android:dataExtractionRules="@xml/data_extraction_rules"
+      android:fullBackupContent="@xml/backup_rules"
+      android:icon="@mipmap/ic_launcher"
+      android:label="@string/app_name"
+      android:supportsRtl="true"
+      android:theme="@style/ThemeDaroca"
+      tools:targetApi="31">
+    <activity
+        android:name=".activity.ClientHomeActivity"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    <activity
+        android:name=".activity.ProdutoresActivity"
+        android:exported="false" />
+    <activity
+        android:name=".activity.PedidoDaSacolaActivity"
+        android:exported="false" />
+    <activity
+        android:name=".activity.PedidoActivity"
+        android:exported="false" />
+    <activity
+        android:name=".activity.ItemPedidoActivity"
+        android:exported="false" />
+    <activity
+        android:name=".activity.CadastrarProdutoActivity1"
+        android:exported="false" />
+    <activity
+        android:name=".activity.CadastrarProdutoActivity2"
+        android:exported="false" />
+    <activity
+        android:name=".activity.PrincipalComercianteActivity"
+        android:exported="false" />
+    <activity
+        android:name=".activity.PrincipalClienteActivity"
+        android:exported="false" />
+    <activity
+        android:name=".model.CategoriaUsuario"
+        android:exported="false" />
+    <activity
+        android:name=".activity.PrincipalProdutorActivity"
+        android:exported="false"
+        android:label="@string/title_activity_principal" />
+    <activity
+        android:name=".activity.CadastrarActivity"
+        android:exported="false"
+        android:theme="@style/ThemeDaroca.NoActionBar" />
+    <activity
+        android:name=".activity.MainActivity"
+        android:exported="false"
+        android:label="@string/title_activity_login" />
+    <activity
+        android:name=".activity.LoginActivity"
+        android:exported="true"
+        android:theme="@style/ThemeDaroca.NoActionBar" >
+    </activity>
+  </application>
 
 </manifest>

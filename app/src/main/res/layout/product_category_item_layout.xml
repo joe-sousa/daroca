@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp">
+
+  <androidx.cardview.widget.CardView
+      android:layout_width="140dp"
+      android:layout_height="wrap_content"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      android:backgroundTint="@color/light_gray"
+      app:cardCornerRadius="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+      <androidx.cardview.widget.CardView
+          android:id="@+id/productImageCardView"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:cardCornerRadius="8dp"
+          app:layout_constraintLeft_toLeftOf="parent"
+          app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/img_child_item"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:background="@color/black"
+            android:contentDescription="@string/imagem_do_produto"
+            android:scaleType="centerCrop"
+            android:src="@drawable/pote_mel" />
+      </androidx.cardview.widget.CardView>
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+          android:layout_width="140dp"
+          android:layout_height="wrap_content"
+          android:paddingVertical="4dp"
+          android:paddingHorizontal="6dp"
+          app:layout_constraintLeft_toLeftOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/productImageCardView">
+
+        <TextView
+            android:id="@+id/productCategoryItemNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nome Produto"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/productCategoryItemUnitsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5 unidades"
+            android:textSize="12sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/productCategoryItemNameTextView" />
+
+        <TextView
+            android:id="@+id/productCategoryItemPriceTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="R$ 12,00"
+            android:textColor="@color/green"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/productCategoryItemUnitsTextView" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
