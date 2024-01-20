@@ -4,9 +4,9 @@ import java.util.List;
 
 public class ProductCategory {
     private String name;
-    private List<ProductCategoryItem> items;
+    private List<Produto> items;
 
-    public ProductCategory(String name, List<ProductCategoryItem> items) {
+    public ProductCategory(String name, List<Produto> items) {
         this.name = name;
         this.items = items;
     }
@@ -19,11 +19,11 @@ public class ProductCategory {
         this.name = name;
     }
 
-    public List<ProductCategoryItem> getItems() {
+    public List<Produto> getItems() {
         return items;
     }
 
-    public void setItems(List<ProductCategoryItem> items) {
+    public void setItems(List<Produto> items) {
         this.items = items;
     }
 }

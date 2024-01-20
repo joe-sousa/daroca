@@ -1,6 +1,5 @@
 package com.example.daroca.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +11,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.daroca.R;
-import com.example.daroca.model.ProductCategoryItem;
+import com.example.daroca.helper.CurrencyFormatter;
+import com.example.daroca.model.Produto;
 
 import java.util.List;
 
 public class ProductCategoryItemAdapter extends RecyclerView.Adapter<ProductCategoryItemAdapter.ProductCategoryItemViewHolder> {
-  private final List<ProductCategoryItem> productCategoryItems;
+  private final List<Produto> productCategoryItems;
   private final OnItemClickListener onItemClickListener;
 
-  public ProductCategoryItemAdapter(List<ProductCategoryItem> productCategoryItems, OnItemClickListener listener) {
+  public ProductCategoryItemAdapter(List<Produto> productCategoryItems, OnItemClickListener listener) {
     this.productCategoryItems = productCategoryItems;
     this.onItemClickListener = listener;
   }
@@ -39,7 +39,7 @@ public class ProductCategoryItemAdapter extends RecyclerView.Adapter<ProductCate
 
   @Override
   public void onBindViewHolder(@NonNull ProductCategoryItemViewHolder holder, int position) {
-    ProductCategoryItem productCategoryItem = this.productCategoryItems.get(position);
+    Produto productCategoryItem = this.productCategoryItems.get(position);
     holder.bind(productCategoryItem, this.onItemClickListener);
   }
 
@@ -49,7 +49,7 @@ public class ProductCategoryItemAdapter extends RecyclerView.Adapter<ProductCate
   }
 
   public interface OnItemClickListener {
-    void onItemClick(ProductCategoryItem item);
+    void onItemClick(Produto item);
   }
 
   static class ProductCategoryItemViewHolder extends RecyclerView.ViewHolder {
@@ -57,13 +57,19 @@ public class ProductCategoryItemAdapter extends RecyclerView.Adapter<ProductCate
       super(itemView);
     }
 
-    public void bind(ProductCategoryItem productCategoryItem, OnItemClickListener onItemClickListener) {
+    public void bind(Produto productCategoryItem, OnItemClickListener onItemClickListener) {
       TextView productCategoryItemNameTextView = this.itemView.findViewById(R.id.productCategoryItemNameTextView);
       ImageView productCategoryItemImageView = this.itemView.findViewById(R.id.productCategoryItemImageView);
+      TextView productCategoryItemUnitsTextView = this.itemView.findViewById(R.id.productCategoryItemUnitsTextView);
+      TextView productCategoryItemPriceTextView = this.itemView.findViewById(R.id.productCategoryItemPriceTextView);
 
-      productCategoryItemNameTextView.setText(productCategoryItem.getName());
-      String url = productCategoryItem.getImage();
-      Glide.with(productCategoryItemImageView.getContext()).load(url).into(productCategoryItemImageView);
+      productCategoryItemNameTextView.setText(productCategoryItem.getNome());
+      productCategoryItemUnitsTextView.setText(productCategoryItem.getQuantidade() + " unidades");
+
+      String formattedProductPrice = CurrencyFormatter.formatCurrency(productCategoryItem.getPreco());
+      productCategoryItemPriceTextView.setText(formattedProductPrice);
+
+      Glide.with(productCategoryItemImageView.getContext()).load(productCategoryItem.getFoto()).into(productCategoryItemImageView);
 
       itemView.setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View v) {

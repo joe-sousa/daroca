@@ -1,10 +1,13 @@
 package com.example.daroca.activity;
 
+import static com.example.daroca.activity.PrincipalClienteActivity.posicaoProduto;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -13,7 +16,6 @@ import com.example.daroca.R;
 import com.example.daroca.adapter.ProductCategoryAdapter;
 import com.example.daroca.config.ConfiguracaoAuthFirebase;
 import com.example.daroca.model.ProductCategory;
-import com.example.daroca.model.ProductCategoryItem;
 import com.example.daroca.model.Produto;
 import com.example.daroca.model.Produtor;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -137,18 +139,10 @@ public class ClientHomeActivity extends AppCompatActivity {
     List<ProductCategory> productCategories = new ArrayList<>();
 
     productCategoriesMap.forEach((categoryName, categoryProducts) -> {
-      List<ProductCategoryItem> categoryItems = new ArrayList<>();
+      List<Produto> categoryItems = new ArrayList<>();
 
       categoryProducts.forEach(categoryProduct -> {
-        ProductCategoryItem productCategoryItem = new ProductCategoryItem();
-
-        productCategoryItem.setId(categoryProduct.product.getKey());
-        productCategoryItem.setName(categoryProduct.product.getNome());
-        productCategoryItem.setStockTotal(categoryProduct.product.getQuantidade());
-        productCategoryItem.setPrice(categoryProduct.product.getPreco());
-        productCategoryItem.setImage(categoryProduct.product.getFoto());
-
-        categoryItems.add(productCategoryItem);
+        categoryItems.add(categoryProduct.product);
       });
 
       if(categoryItems.size() > 0){
@@ -166,14 +160,19 @@ public class ClientHomeActivity extends AppCompatActivity {
     LinearLayoutManager layoutManager = new LinearLayoutManager(this);
     ProductCategoryAdapter productCategoryAdapter = new ProductCategoryAdapter(
             productCategories,
-            item -> Toast.makeText(this, item.getName(), Toast.LENGTH_LONG).show()
+            item -> {
+              Intent intent = new Intent(this, ItemPedidoActivity.class);
+              intent.putExtra("objeto1", item);
+              intent.putExtra("quantidade", item.getQuantidade());
+              startActivity(intent);
+            }
     );
 
     productCategoriesRecyclerView.setLayoutManager(layoutManager);
     productCategoriesRecyclerView.setAdapter(productCategoryAdapter);
   }
 
-   class ProducerMainProduct{
+   static class ProducerMainProduct{
     Produtor producer;
     Produto product;
 
