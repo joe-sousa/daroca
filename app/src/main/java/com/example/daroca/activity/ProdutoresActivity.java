@@ -2,6 +2,7 @@ package com.example.daroca.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -10,11 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.daroca.R;
-import com.example.daroca.adapter.ProdutoAdapterCliente;
 import com.example.daroca.adapter.ProdutorAdapter;
 import com.example.daroca.config.ConfiguracaoAuthFirebase;
 import com.example.daroca.helper.RecyclerTouchListener;
-import com.example.daroca.model.Produto;
 import com.example.daroca.model.Produtor;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

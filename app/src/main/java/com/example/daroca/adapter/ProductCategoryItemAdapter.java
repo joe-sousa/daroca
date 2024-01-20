@@ -1,13 +1,16 @@
 package com.example.daroca.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.daroca.R;
 import com.example.daroca.model.ProductCategoryItem;
 
@@ -56,8 +59,10 @@ public class ProductCategoryItemAdapter extends RecyclerView.Adapter<ProductCate
 
     public void bind(ProductCategoryItem productCategoryItem, OnItemClickListener onItemClickListener) {
       TextView productCategoryItemNameTextView = this.itemView.findViewById(R.id.productCategoryItemNameTextView);
+      ImageView productCategoryItemImageView = this.itemView.findViewById(R.id.productCategoryItemImageView);
 
       productCategoryItemNameTextView.setText(productCategoryItem.getName());
+      Glide.with(productCategoryItemImageView).load(productCategoryItem.getImage()).into(productCategoryItemImageView);
 
       itemView.setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View v) {

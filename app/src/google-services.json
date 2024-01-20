@@ -1,44 +1,27 @@
 {
   "project_info": {
-    "project_number": "270471074796",
-    "project_id": "daroca-223b6",
-    "storage_bucket": "daroca-223b6.appspot.com"
+    "project_number": "891378466164",
+    "firebase_url": "https://daroca-9c387-default-rtdb.firebaseio.com",
+    "project_id": "daroca-9c387",
+    "storage_bucket": "daroca-9c387.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:270471074796:android:1e1e0223b8c07a706b66c9",
+        "mobilesdk_app_id": "1:891378466164:android:427f5a64570e79bbadc021",
         "android_client_info": {
           "package_name": "com.example.daroca"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "270471074796-jr7geg7rh3110j6k6hk04sa48k0ta3do.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.daroca",
-            "certificate_hash": "67f7a016572179ddc8ae5a54d61840446ade5776"
-          }
-        },
-        {
-          "client_id": "270471074796-catj5t7lj2delltjtv16p0ua1b87n574.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDtDqZV-WdapNfRypHbzERhojzDQLas5bo"
+          "current_key": "AIzaSyAMhfVfaf7O17aA0OoGJXHRSImUJTpMfZs"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "270471074796-catj5t7lj2delltjtv16p0ua1b87n574.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
