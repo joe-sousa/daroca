@@ -109,22 +109,24 @@ public class ClientHomeActivity extends AppCompatActivity {
     producersProductList.forEach(producerProductList -> {
       DataSnapshot producerProductListDataSnapshot = (DataSnapshot) producerProductList;
 
-      DataSnapshot producerFirstProductDataSnapshot = producerProductListDataSnapshot.getChildren().iterator().next();
-      Produto producerFirstProduct = producerFirstProductDataSnapshot.getValue(Produto.class);
+      for (DataSnapshot producerFirstProductDataSnapshot : producerProductListDataSnapshot.getChildren()){
+        Produto producerFirstProduct = producerFirstProductDataSnapshot.getValue(Produto.class);
 
-      assert producerFirstProduct != null;;
+        assert producerFirstProduct != null;;
 
-      List<MainActivity.ProducerMainProduct> categoryProducts = productCategoriesMap.get(producerFirstProduct.getCategoria());
+        List<MainActivity.ProducerMainProduct> categoryProducts = productCategoriesMap.get(producerFirstProduct.getCategoria());
 
-      MainActivity.ProducerMainProduct producerMainProduct = new MainActivity.ProducerMainProduct();
-      producerMainProduct.producer = producers.get(producerFirstProduct.getIdUsuario());
-      producerMainProduct.product = producerFirstProduct;
+        MainActivity.ProducerMainProduct producerMainProduct = new MainActivity.ProducerMainProduct();
+        producerMainProduct.producer = producers.get(producerFirstProduct.getIdUsuario());
+        producerMainProduct.product = producerFirstProduct;
 
-      assert categoryProducts != null;
+        assert categoryProducts != null;
 
-      categoryProducts.add(producerMainProduct);
+        categoryProducts.add(producerMainProduct);
 
-      productCategoriesMap.put(producerFirstProduct.getCategoria(), categoryProducts);
+        productCategoriesMap.put(producerFirstProduct.getCategoria(), categoryProducts);
+      }
+
     });
 
   }

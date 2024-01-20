@@ -62,7 +62,8 @@ public class ProductCategoryItemAdapter extends RecyclerView.Adapter<ProductCate
       ImageView productCategoryItemImageView = this.itemView.findViewById(R.id.productCategoryItemImageView);
 
       productCategoryItemNameTextView.setText(productCategoryItem.getName());
-      Glide.with(productCategoryItemImageView).load(productCategoryItem.getImage()).into(productCategoryItemImageView);
+      String url = productCategoryItem.getImage();
+      Glide.with(productCategoryItemImageView.getContext()).load(url).into(productCategoryItemImageView);
 
       itemView.setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View v) {
