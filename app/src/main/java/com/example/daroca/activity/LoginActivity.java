@@ -42,7 +42,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private DatabaseReference firebaseRef = ConfiguracaoAuthFirebase.getFirebaseDatabase();
 
-    private Cliente cliente;
     private Produtor produtor;
     private Comerciante comerciante;
     //private CheckBox checkBox;
@@ -121,9 +120,6 @@ public class LoginActivity extends AppCompatActivity {
 
         DatabaseReference usuarioRef = firebaseRef.child("usuario")
                 .child("comerciante");
-
-        DatabaseReference usuarioRef1 = firebaseRef.child("usuario")
-                .child("cliente");
 
         DatabaseReference usuarioRef2 = firebaseRef.child("usuario")
                 .child("produtor");

@@ -13,7 +13,6 @@ import com.example.daroca.activity.CadastrarActivity;
 public class CategoriaUsuario extends AppCompatActivity {
 
     private ImageView produtor;
-    private ImageView cliente;
     private ImageView comerciante;
 
     @Override
@@ -25,7 +24,6 @@ public class CategoriaUsuario extends AppCompatActivity {
         setTitleColor(R.color.white);
 
         produtor = findViewById(R.id.produtorId);
-        cliente = findViewById(R.id.clienteId);
         comerciante = findViewById(R.id.empresarioId);
 
     }
@@ -36,11 +34,6 @@ public class CategoriaUsuario extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void escolherCliente(View view){
-        Intent intent = new Intent(getApplicationContext(), CadastrarActivity.class);
-        intent.putExtra("categoria2", "cliente");
-        startActivity(intent);
-    }
     public void escolherEmpresario(View view){
         Intent intent = new Intent(getApplicationContext(), CadastrarActivity.class);
         intent.putExtra("categoria3", "empresario");
