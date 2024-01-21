@@ -124,25 +124,11 @@ public class LoginActivity extends AppCompatActivity {
         DatabaseReference usuarioRef2 = firebaseRef.child("usuario")
                 .child("produtor");
 
-            usuarioRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.child(idUser).exists()){
-                            startActivity(new Intent(getApplicationContext(), PrincipalComercianteActivity.class));
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-        usuarioRef1.addValueEventListener(new ValueEventListener() {
+        usuarioRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.child(idUser).exists()){
-                        startActivity(new Intent(getApplicationContext(), ProdutoresActivity.class));
+                        startActivity(new Intent(getApplicationContext(), PrincipalComercianteActivity.class));
                 }
             }
 
