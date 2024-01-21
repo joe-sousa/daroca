@@ -41,7 +41,7 @@ public class ProdutoresActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_produtores);
-        setTitle("Produtores");
+        setTitle("Lista de Produtores");
         recyclerViewProdutor = findViewById(R.id.recyclerViewProdutor);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerViewProdutor.setLayoutManager(layoutManager);
