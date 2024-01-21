@@ -35,7 +35,6 @@ public class CadastrarActivity extends AppCompatActivity {
 
     private DatabaseReference firebaseRef = ConfiguracaoAuthFirebase.getFirebaseDatabase();
 
-    private Cliente cliente;
     private Produtor produtor;
     private Comerciante comerciante;
 
@@ -54,7 +53,6 @@ public class CadastrarActivity extends AppCompatActivity {
         Bundle dados = getIntent().getExtras();
 
         String categoriaProdutor = dados.getString("categoria1");
-        String categoriaCliente = dados.getString("categoria2");
         String categoriaComerciante = dados.getString("categoria3");
 
         cadastrarUsuario.setOnClickListener(new View.OnClickListener() {
@@ -80,12 +78,7 @@ public class CadastrarActivity extends AppCompatActivity {
                                     "Preencha a senha",
                                     Toast.LENGTH_LONG).show();
                         }else{
-                            if(categoriaCliente != null){
-//                                    Toast.makeText(CadastrarActivity.this,
-//                                            "Recursos para cliente serão liberados em breve",
-//                                            Toast.LENGTH_LONG).show();
-                                    criarCliente(nome, email, senha);
-                                }else if(categoriaProdutor != null){
+                           if(categoriaProdutor != null){
                                     criarProdutor(nome, email, senha, pix);
                                 }else if(categoriaComerciante != null){
 //                                    Toast.makeText(CadastrarActivity.this,
@@ -119,37 +112,7 @@ public class CadastrarActivity extends AppCompatActivity {
         cadastrarProdutor();
     }
 
-    private void criarCliente(String nome, String email, String senha) {
-        cliente = new Cliente();
-        cliente.setNome(nome);
-        cliente.setEmail(email);
-        cliente.setSenha(senha);
-        cliente.setTipo("cliente");
-        cadastrarCliente();
-    }
-
-    //Método para cadastrar o cliente usando DesignPattern Singleton com a classe ConfiguracaoAuthFirebase
-    public void cadastrarCliente(){
-        autenticacao = ConfiguracaoAuthFirebase.getFirebaseAutenticacao();
-        autenticacao.createUserWithEmailAndPassword(cliente.getEmail(),
-                cliente.getSenha()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    String idCliente = Base64Custom.codificarBase(cliente.getEmail());
-                    cliente.setIdUsuario(idCliente);
-                    cliente.salvar();
-                    Toast.makeText(CadastrarActivity.this,
-                            "Cadastro concluído com sucesso.",
-                            Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                            startActivity(intent);
-                }else{
-                    validarMetodos(task);
-                }
-            }
-        });
-    }
+    //Métodos para cadastrar o usuarios usando DesignPattern Singleton com a classe ConfiguracaoAuthFirebase
 
     public void cadastrarProdutor(){
         autenticacao = ConfiguracaoAuthFirebase.getFirebaseAutenticacao();
