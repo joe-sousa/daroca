@@ -30,13 +30,13 @@ public class CategoriaUsuario extends AppCompatActivity {
 
     public void escolherProdutor(View view){
         Intent intent = new Intent(getApplicationContext(), CadastrarActivity.class);
-        intent.putExtra("categoria1", "produtor");
+        intent.putExtra("produtor", "produtor");
         startActivity(intent);
     }
 
     public void escolherEmpresario(View view){
         Intent intent = new Intent(getApplicationContext(), CadastrarActivity.class);
-        intent.putExtra("categoria3", "empresario");
+        intent.putExtra("comerciante", "comerciante");
         startActivity(intent);
     }
 }

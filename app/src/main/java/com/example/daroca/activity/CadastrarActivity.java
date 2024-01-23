@@ -52,8 +52,8 @@ public class CadastrarActivity extends AppCompatActivity {
 
         Bundle dados = getIntent().getExtras();
 
-        String categoriaProdutor = dados.getString("categoria1");
-        String categoriaComerciante = dados.getString("categoria3");
+        String categoriaProdutor = dados.getString("produtor");
+        String categoriaComerciante = dados.getString("comerciante");
 
         cadastrarUsuario.setOnClickListener(new View.OnClickListener() {
             @Override
