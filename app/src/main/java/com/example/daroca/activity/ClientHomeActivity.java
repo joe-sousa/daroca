@@ -68,7 +68,7 @@ public class ClientHomeActivity extends AppCompatActivity {
 
   private void loadProductCategories(Map<String, Produtor> producers){
     List<Task<DataSnapshot>> loadProducersProductListTasks = generateLoadAllProducersProductListTasks(producers);
-    Map<String, List<MainActivity.ProducerMainProduct>> productCategoriesMap = genereteProductCategoriesHashMap();
+    Map<String, List<ProducerMainProduct>> productCategoriesMap = genereteProductCategoriesHashMap();
 
     Tasks.whenAllSuccess(loadProducersProductListTasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
       @Override
@@ -91,13 +91,13 @@ public class ClientHomeActivity extends AppCompatActivity {
     return tasks;
   }
 
-  private Map<String, List<MainActivity.ProducerMainProduct>> genereteProductCategoriesHashMap(){
-    Map<String, List<MainActivity.ProducerMainProduct>> productCategoriesMap = new HashMap<>();
+  private Map<String, List<ProducerMainProduct>> genereteProductCategoriesHashMap(){
+    Map<String, List<ProducerMainProduct>> productCategoriesMap = new HashMap<>();
 
     String[] productCategories = getResources().getStringArray(R.array.lista_categorias_produtos);
 
     for (String productCategory : productCategories) {
-      productCategoriesMap.put(productCategory, new ArrayList<MainActivity.ProducerMainProduct>());
+      productCategoriesMap.put(productCategory, new ArrayList<ProducerMainProduct>());
     }
 
     return productCategoriesMap;
@@ -105,7 +105,7 @@ public class ClientHomeActivity extends AppCompatActivity {
 
   private void groupProductsPerCategory(
           List<Object> producersProductList,
-          Map<String, List<MainActivity.ProducerMainProduct>> productCategoriesMap,
+          Map<String, List<ProducerMainProduct>> productCategoriesMap,
           Map<String, Produtor> producers
   ){
     producersProductList.forEach(producerProductList -> {
@@ -116,9 +116,9 @@ public class ClientHomeActivity extends AppCompatActivity {
 
         assert producerFirstProduct != null;;
 
-        List<MainActivity.ProducerMainProduct> categoryProducts = productCategoriesMap.get(producerFirstProduct.getCategoria());
+        List<ProducerMainProduct> categoryProducts = productCategoriesMap.get(producerFirstProduct.getCategoria());
 
-        MainActivity.ProducerMainProduct producerMainProduct = new MainActivity.ProducerMainProduct();
+        ProducerMainProduct producerMainProduct = new ProducerMainProduct();
         producerMainProduct.producer = producers.get(producerFirstProduct.getIdUsuario());
         producerMainProduct.product = producerFirstProduct;
 
@@ -134,7 +134,7 @@ public class ClientHomeActivity extends AppCompatActivity {
   }
 
   private List<ProductCategory> generateProductCategoriesToRecyclerView(
-          Map<String, List<MainActivity.ProducerMainProduct>> productCategoriesMap
+          Map<String, List<ProducerMainProduct>> productCategoriesMap
   ){
     List<ProductCategory> productCategories = new ArrayList<>();
 
