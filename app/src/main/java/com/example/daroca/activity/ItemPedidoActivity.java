@@ -1,36 +1,38 @@
 package com.example.daroca.activity;
 
 import android.content.Intent;
-import android.media.audiofx.DynamicsProcessing;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.daroca.R;
-import com.example.daroca.config.ConfiguracaoAuthFirebase;
-import com.example.daroca.helper.UsuarioFirebase;
+import com.example.daroca.adapter.ProducerProductAdapter;
 import com.example.daroca.model.ItemPedido;
-import com.example.daroca.model.Pedido;
 import com.example.daroca.model.Produto;
-import com.example.daroca.model.Produtor;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemPedidoActivity extends AppCompatActivity {
 
-    Produto produto;
-    private TextView itemProdutoTextView;
+    Produto produtoSelecionado;
+    private ImageView imageViewProdutoSelecionado;
     private TextView nomeProdutoTextView;
     private TextView descricaoProdutoTextView;
     private TextView precoProdutoTextView;
@@ -40,13 +42,16 @@ public class ItemPedidoActivity extends AppCompatActivity {
     private Button avancarTelaPedidos;
     private TextView textViewValorTotal;
     private DatabaseReference firebaseRef;
-    private DatabaseReference usuarioRef;
-    private DatabaseReference produtorRef;
     private ItemPedido itemPedido;
     private int quantidade = 0;
     private int quantidadeProduto = 0;
     private int qtd = 0;
     private boolean flag = true;
+
+    private String idProdutor;
+    List<Produto> todosProdutos;
+    List<Produto> produtosVisiveis;
+    ProducerProductAdapter produtoProdutorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,18 +62,20 @@ public class ItemPedidoActivity extends AppCompatActivity {
 
         inicializandoAtributosDoItemPedido();
 
-        produto = new Produto();
+        produtoSelecionado = new Produto();
 
         Bundle dados = getIntent().getExtras();
         if (dados != null) {
             //Recebendo dados do produto da PrincipalClienteActivity através do ProdutorAdapterCliente.java
             Produto produtoEmCadastro = (Produto) dados.getSerializable("objeto1");
             quantidadeProduto = dados.getInt("quantidade", 0);
-            produto = new Produto(produtoEmCadastro);
+            produtoSelecionado = new Produto(produtoEmCadastro);
             Log.i("msg", "qtdProdutoNoItemPedido " + quantidadeProduto);
         }
 
-        String idUsuario = produto.getIdUsuario();
+        Log.d("ID RPODUTO =============== ", String.valueOf(produtoSelecionado));
+
+        String idUsuario = produtoSelecionado.getIdUsuario();
 
         inicializandoItemPedido(idUsuario);
         quantidade=quantidadeProduto;
@@ -88,7 +95,7 @@ public class ItemPedidoActivity extends AppCompatActivity {
             }
         });
 
-    avancarTelaPedidos.setOnClickListener(new View.OnClickListener() {
+        avancarTelaPedidos.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if(quantidade > 0) {
@@ -102,21 +109,34 @@ public class ItemPedidoActivity extends AppCompatActivity {
 
         }
     });
+
+        this.idProdutor = produtoSelecionado.getIdUsuario();
+        this.inicializarRecyclerViewProdutosProdutor(idProdutor);
+        this.atualizarInformacoesProdutoSelecionado();
     }
 
-    private void inicializandoItemPedido(String idUsuario) {
-        nomeProdutoTextView.setText(produto.getNome());
-        descricaoProdutoTextView.setText(produto.getDescricao());
-        precoProdutoTextView.setText(String.valueOf(produto.getPreco()));
+    private void inicializandoItemPedido(String idProdutor) {
+        nomeProdutoTextView.setText(produtoSelecionado.getNome());
+        descricaoProdutoTextView.setText(produtoSelecionado.getDescricao());
+        precoProdutoTextView.setText(String.valueOf(produtoSelecionado.getPreco()));
         itemPedido = new ItemPedido();
-        itemPedido.setProduto(produto);
-        itemPedido.setIdProdutor(idUsuario);
+        itemPedido.setProduto(produtoSelecionado);
+        itemPedido.setIdProdutor(idProdutor);
         itemPedido.setQuantidade(quantidadeProduto);
         qtdProdutoTextView.setText(String.valueOf(quantidadeProduto));
     }
 
+    private void atualizarInformacoesProdutoSelecionado(){
+        nomeProdutoTextView.setText(produtoSelecionado.getNome());
+        descricaoProdutoTextView.setText(produtoSelecionado.getDescricao());
+        precoProdutoTextView.setText(String.valueOf(produtoSelecionado.getPreco()));
+        qtdProdutoTextView.setText(String.valueOf(produtoSelecionado.getQuantidade()));
+
+        Glide.with(imageViewProdutoSelecionado.getContext()).load(produtoSelecionado.getFoto()).into(imageViewProdutoSelecionado);
+    }
+
     private void inicializandoAtributosDoItemPedido() {
-        itemProdutoTextView = findViewById(R.id.textTesteItemPedido);
+        imageViewProdutoSelecionado = findViewById(R.id.imageViewProdutoSelecionado);
         nomeProdutoTextView = findViewById(R.id.textNome);
         descricaoProdutoTextView = findViewById(R.id.textoDescricaoProd);
         precoProdutoTextView = findViewById(R.id.textoPreco);
@@ -193,5 +213,63 @@ public class ItemPedidoActivity extends AppCompatActivity {
         double precoxqtd = qtd * itemPedido.getProduto().getPreco();
         itemPedido.setValorPrecoXQtdItem(precoxqtd);
         calcularValorTotal();
+    }
+
+    private void inicializarRecyclerViewProdutosProdutor(String idProdutor){
+        this.todosProdutos = new ArrayList<>();
+        this.produtosVisiveis = new ArrayList<>();
+
+        RecyclerView produtosRecyclerView = findViewById(R.id.listaProdutos);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
+        this.produtoProdutorAdapter = new ProducerProductAdapter(
+                this.produtosVisiveis,
+                item -> {
+                    Log.d("ITEM TO HIDE =====> =", String.valueOf(item));
+                    atualizarProdutosVisiveis(produtoSelecionado, item);
+                    this.produtoSelecionado = item;
+                    atualizarInformacoesProdutoSelecionado();
+                });
+
+        produtosRecyclerView.setLayoutManager(layoutManager);
+        produtosRecyclerView.setAdapter(this.produtoProdutorAdapter);
+
+        this.carregarProdutosProdutor(idProdutor);
+    }
+
+    public void carregarProdutosProdutor(String idProdutor) {
+        DatabaseReference produtoCollectionRef = firebaseRef.child("produto").child(idProdutor);
+
+        produtoCollectionRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dados: snapshot.getChildren()){
+                    Produto produto = dados.getValue(Produto.class);
+
+                    assert produto != null;
+                    produto.setKey(dados.getKey());
+
+                    todosProdutos.add(produto);
+
+                    if(!produtoSelecionado.getKey().equalsIgnoreCase(produto.getKey())){
+                        produtosVisiveis.add(produto);
+                    }
+                }
+
+                produtoProdutorAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void atualizarProdutosVisiveis(Produto produtoSelecionadoAnteriormente, Produto produtoSelecionado){
+        this.produtosVisiveis.add(produtoSelecionadoAnteriormente);
+        this.produtosVisiveis.remove(produtoSelecionado);
+
+        this.produtoProdutorAdapter.notifyDataSetChanged();
     }
 }

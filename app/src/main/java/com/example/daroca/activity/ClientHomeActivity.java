@@ -111,22 +111,23 @@ public class ClientHomeActivity extends AppCompatActivity {
     producersProductList.forEach(producerProductList -> {
       DataSnapshot producerProductListDataSnapshot = (DataSnapshot) producerProductList;
 
-      for (DataSnapshot producerFirstProductDataSnapshot : producerProductListDataSnapshot.getChildren()){
-        Produto producerFirstProduct = producerFirstProductDataSnapshot.getValue(Produto.class);
+      for (DataSnapshot producerProductDataSnapshot : producerProductListDataSnapshot.getChildren()){
+        Produto producerProduct = producerProductDataSnapshot.getValue(Produto.class);
 
-        assert producerFirstProduct != null;;
+        assert producerProduct != null;;
+        producerProduct.setKey(producerProductDataSnapshot.getKey());
 
-        List<ProducerMainProduct> categoryProducts = productCategoriesMap.get(producerFirstProduct.getCategoria());
+        List<ProducerMainProduct> categoryProducts = productCategoriesMap.get(producerProduct.getCategoria());
 
         ProducerMainProduct producerMainProduct = new ProducerMainProduct();
-        producerMainProduct.producer = producers.get(producerFirstProduct.getIdUsuario());
-        producerMainProduct.product = producerFirstProduct;
+        producerMainProduct.producer = producers.get(producerProduct.getIdUsuario());
+        producerMainProduct.product = producerProduct;
 
         assert categoryProducts != null;
 
         categoryProducts.add(producerMainProduct);
 
-        productCategoriesMap.put(producerFirstProduct.getCategoria(), categoryProducts);
+        productCategoriesMap.put(producerProduct.getCategoria(), categoryProducts);
       }
 
     });
