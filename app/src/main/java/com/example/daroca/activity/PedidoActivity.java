@@ -97,20 +97,20 @@ public class PedidoActivity extends AppCompatActivity {
 //            }
 //        });
 
-        Bundle dados = getIntent().getExtras();
-        //Recebendo dados de ItemPedidoActivity
-        Produto produto = (Produto) dados.getSerializable("objeto2");
-        int qtd = dados.getInt("quantidade");
-        String idProdutor = dados.getString("idProdutor");
-
-        itemPedido = new ItemPedido();
-        itemPedido.setProduto(produto);
-        itemPedido.setQuantidade(qtd);
-        itemPedido.setIdProdutor(idProdutor);
-        itemPedido.setValorPrecoXQtdItem(produto.getPreco() * produto.getQuantidade());
-        itemPedido.getProduto().getNome();
-        itemPedido.getProduto().getPreco();
-        itemPedido.getIdProdutor();
+//        Bundle dados = getIntent().getExtras();
+//        //Recebendo dados de ItemPedidoActivity
+//        Produto produto = (Produto) dados.getSerializable("objeto2");
+//        int qtd = dados.getInt("quantidade");
+//        String idProdutor = dados.getString("idProdutor");
+//
+//        itemPedido = new ItemPedido();
+//        itemPedido.setProduto(produto);
+//        itemPedido.setQuantidade(qtd);
+//        itemPedido.setIdProdutor(idProdutor);
+//        itemPedido.setValorPrecoXQtdItem(produto.getPreco() * produto.getQuantidade());
+//        itemPedido.getProduto().getNome();
+//        itemPedido.getProduto().getPreco();
+//        itemPedido.getIdProdutor();
 
         novoItem.setOnClickListener(new View.OnClickListener() {
             @Override

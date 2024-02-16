@@ -27,249 +27,360 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class ItemPedidoActivity extends AppCompatActivity {
 
-    Produto produtoSelecionado;
-    private ImageView imageViewProdutoSelecionado;
-    private TextView nomeProdutoTextView;
-    private TextView descricaoProdutoTextView;
-    private TextView precoProdutoTextView;
-    private TextView qtdProdutoTextView;
-    private ImageButton aumentarButton;
-    private ImageButton diminuirButton;
-    private Button avancarTelaPedidos;
-    private TextView textViewValorTotal;
-    private DatabaseReference firebaseRef;
-    private ItemPedido itemPedido;
-    private int quantidade = 0;
-    private int quantidadeProduto = 0;
-    private int qtd = 0;
-    private boolean flag = true;
+  Produto produtoSelecionado;
+  private ImageView imageViewProdutoSelecionado;
+  private TextView nomeProdutoTextView;
+  private TextView descricaoProdutoTextView;
+  private TextView precoProdutoTextView;
+  private TextView qtdProdutoTextView;
+  private ImageButton aumentarButton;
+  private ImageButton diminuirButton;
+  private Button finishOrderButton;
+  private Button saveItemInOrderButton;
+  private Button removeItemFromBagButton;
+  private TextView textViewValorTotal;
+  private DatabaseReference firebaseRef;
+  private ItemPedido itemPedido;
+  private int quantidade = 0;
+  private int quantidadeProduto = 0;
+  private int qtd = 0;
+  private boolean flag = true;
 
-    private String idProdutor;
-    List<Produto> todosProdutos;
-    List<Produto> produtosVisiveis;
-    ProducerProductAdapter produtoProdutorAdapter;
+  private String idProdutor;
+  List<Produto> todosProdutos;
+  List<Produto> produtosVisiveis;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_item_pedido);
+  Map<String, ItemPedido> orderItems = new HashMap<>();
 
-        firebaseRef = FirebaseDatabase.getInstance().getReference();
+  ProducerProductAdapter produtoProdutorAdapter;
 
-        inicializandoAtributosDoItemPedido();
 
-        produtoSelecionado = new Produto();
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_item_pedido);
 
-        Bundle dados = getIntent().getExtras();
-        if (dados != null) {
-            //Recebendo dados do produto da PrincipalClienteActivity através do ProdutorAdapterCliente.java
-            Produto produtoEmCadastro = (Produto) dados.getSerializable("objeto1");
-            quantidadeProduto = dados.getInt("quantidade", 0);
-            produtoSelecionado = new Produto(produtoEmCadastro);
-            Log.i("msg", "qtdProdutoNoItemPedido " + quantidadeProduto);
-        }
+    firebaseRef = FirebaseDatabase.getInstance().getReference();
 
-        Log.d("ID RPODUTO =============== ", String.valueOf(produtoSelecionado));
+    inicializandoAtributosDoItemPedido();
 
-        String idUsuario = produtoSelecionado.getIdUsuario();
+    produtoSelecionado = new Produto();
 
-        inicializandoItemPedido(idUsuario);
-        quantidade=quantidadeProduto;
-        calcularPrecoxQtd();
+    Bundle dados = getIntent().getExtras();
+    if (dados != null) {
+      //Recebendo dados do produto da PrincipalClienteActivity através do ProdutorAdapterCliente.java
+      Produto produtoEmCadastro = (Produto) dados.getSerializable("objeto1");
+      quantidadeProduto = dados.getInt("quantidade", 0);
+      produtoSelecionado = new Produto(produtoEmCadastro);
+      Log.i("msg", "qtdProdutoNoItemPedido " + quantidadeProduto);
+    }
 
-        aumentarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                incrementarQuantidade();
-            }
-        });
+    Log.d("ID RPODUTO =============== ", String.valueOf(produtoSelecionado));
 
-        diminuirButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                decrementarQuantidade();
-            }
-        });
+    String idUsuario = produtoSelecionado.getIdUsuario();
 
-        avancarTelaPedidos.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if(quantidade > 0) {
-                itemPedido.salvarItemPedido();
-                abrirPedidoActivity();
-            }else{
-                Toast.makeText(ItemPedidoActivity.this,
-                        "A quantidade não pode ser menor ou igual a zero",
-                        Toast.LENGTH_SHORT).show();
-            }
+    inicializandoItemPedido(idUsuario);
+    quantidade=quantidadeProduto;
+    calcularPrecoxQtd();
 
-        }
+    aumentarButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        incrementarQuantidade();
+      }
     });
 
-        this.idProdutor = produtoSelecionado.getIdUsuario();
-        this.inicializarRecyclerViewProdutosProdutor(idProdutor);
-        this.atualizarInformacoesProdutoSelecionado();
-    }
+    diminuirButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        decrementarQuantidade();
+      }
+    });
 
-    private void inicializandoItemPedido(String idProdutor) {
-        nomeProdutoTextView.setText(produtoSelecionado.getNome());
-        descricaoProdutoTextView.setText(produtoSelecionado.getDescricao());
-        precoProdutoTextView.setText(String.valueOf(produtoSelecionado.getPreco()));
-        itemPedido = new ItemPedido();
-        itemPedido.setProduto(produtoSelecionado);
-        itemPedido.setIdProdutor(idProdutor);
-        itemPedido.setQuantidade(quantidadeProduto);
-        qtdProdutoTextView.setText(String.valueOf(quantidadeProduto));
-    }
+    saveItemInOrderButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        int orderItemQuantity = getSelectedItemQuantityInOrder();
 
-    private void atualizarInformacoesProdutoSelecionado(){
-        nomeProdutoTextView.setText(produtoSelecionado.getNome());
-        descricaoProdutoTextView.setText(produtoSelecionado.getDescricao());
-        precoProdutoTextView.setText(String.valueOf(produtoSelecionado.getPreco()));
-        qtdProdutoTextView.setText(String.valueOf(produtoSelecionado.getQuantidade()));
-
-        Glide.with(imageViewProdutoSelecionado.getContext()).load(produtoSelecionado.getFoto()).into(imageViewProdutoSelecionado);
-    }
-
-    private void inicializandoAtributosDoItemPedido() {
-        imageViewProdutoSelecionado = findViewById(R.id.imageViewProdutoSelecionado);
-        nomeProdutoTextView = findViewById(R.id.textNome);
-        descricaoProdutoTextView = findViewById(R.id.textoDescricaoProd);
-        precoProdutoTextView = findViewById(R.id.textoPreco);
-        diminuirButton = findViewById(R.id.imageButtonDiminuirQtd);
-        aumentarButton = findViewById(R.id.imageButtonAumentarQtd);
-        qtdProdutoTextView = findViewById(R.id.idQuantidadeItensPedido);
-        avancarTelaPedidos = findViewById(R.id.buttonIncluirPedido);
-        textViewValorTotal = findViewById(R.id.valorTotalDoPedido);
-    }
-
-    private void abrirPedidoActivity() {
-        Log.i("abrirPedidoActivity", "Iniciando PedidoActivity");
-        if (itemPedido != null && itemPedido.getProduto() != null && itemPedido.getIdProdutor() != null) {
-            Intent myIntent = new Intent(getApplicationContext(), PedidoActivity.class);
-            myIntent.putExtra("objeto2", itemPedido.getProduto());
-            myIntent.putExtra("idProdutor", itemPedido.getIdProdutor());
-            myIntent.putExtra("quantidade", itemPedido.getQuantidade());
-            try {
-                startActivity(myIntent);
-                Log.i("abrirPedidoActivity", "PedidoActivity iniciada com sucesso");
-            } catch (Exception e) {
-                Log.e("abrirPedidoActivity", "Erro ao iniciar PedidoActivity: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }else{
-            Log.e("abrirPedidoActivity", "Dados insuficientes para iniciar PedidoActivity");
-            // Adicione uma mensagem de log ou feedback para identificar o problema
-            Toast.makeText(ItemPedidoActivity.this, "Dados insuficientes para iniciar PedidoActivity", Toast.LENGTH_SHORT).show();
+        if(orderItemQuantity <= 0){
+          Toast.makeText(ItemPedidoActivity.this, "A quantidade não pode ser menor ou igual a zero", Toast.LENGTH_SHORT).show();
+        } else {
+          saveSelectedItemInBag();
         }
+      }
+    });
+
+    removeItemFromBagButton.setOnClickListener(new View.OnClickListener(){
+      @Override
+      public void onClick(View view) {
+        removeSelectedItemFromBag();
+      }
+    });
+
+    finishOrderButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        finishOrder();
+      }
+    });
+
+    this.idProdutor = produtoSelecionado.getIdUsuario();
+    this.inicializarRecyclerViewProdutosProdutor(idProdutor);
+
+    this.updateActionButtonsOnChangeBag();
+  }
+
+  private void inicializandoItemPedido(String idProdutor) {
+    nomeProdutoTextView.setText(produtoSelecionado.getNome());
+    descricaoProdutoTextView.setText(produtoSelecionado.getDescricao());
+    precoProdutoTextView.setText(String.valueOf(produtoSelecionado.getPreco()));
+    itemPedido = new ItemPedido();
+    itemPedido.setProduto(produtoSelecionado);
+    itemPedido.setIdProdutor(idProdutor);
+    itemPedido.setQuantidade(quantidadeProduto);
+    qtdProdutoTextView.setText(String.valueOf(quantidadeProduto));
+  }
+
+  private void atualizarInformacoesProdutoSelecionado(){
+    nomeProdutoTextView.setText(produtoSelecionado.getNome());
+    descricaoProdutoTextView.setText(produtoSelecionado.getDescricao());
+    precoProdutoTextView.setText(String.valueOf(produtoSelecionado.getPreco()));
+    qtdProdutoTextView.setText(String.valueOf(produtoSelecionado.getQuantidade()));
+
+    Glide.with(imageViewProdutoSelecionado.getContext()).load(produtoSelecionado.getFoto()).into(imageViewProdutoSelecionado);
+
+    this.updateActionButtonsOnChangeBag();
+  }
+
+  private void updateActionButtonsOnChangeBag(){
+    updateRemoveItemFromBagButtonVisibility();
+    updateSaveItemInOrderButtonLabel();
+  }
+
+  private void updateRemoveItemFromBagButtonVisibility(){
+    if(isSelectedItemInBag(produtoSelecionado.getKey())){
+      removeItemFromBagButton.setVisibility(View.VISIBLE);
+    } else{
+      removeItemFromBagButton.setVisibility(View.GONE);
+    }
+  }
+
+  private void updateSaveItemInOrderButtonLabel(){
+    if(isSelectedItemInBag(produtoSelecionado.getKey())){
+      saveItemInOrderButton.setText("Atualizar na sacola");
+    } else{
+      saveItemInOrderButton.setText("Adicionar na sacola");
+    }
+  }
+
+  private void inicializandoAtributosDoItemPedido() {
+    imageViewProdutoSelecionado = findViewById(R.id.imageViewProdutoSelecionado);
+    nomeProdutoTextView = findViewById(R.id.textNome);
+    descricaoProdutoTextView = findViewById(R.id.textoDescricaoProd);
+    precoProdutoTextView = findViewById(R.id.textoPreco);
+    diminuirButton = findViewById(R.id.imageButtonDiminuirQtd);
+    aumentarButton = findViewById(R.id.imageButtonAumentarQtd);
+    qtdProdutoTextView = findViewById(R.id.idQuantidadeItensPedido);
+    saveItemInOrderButton = findViewById(R.id.buttonIncluirPedido);
+    textViewValorTotal = findViewById(R.id.valorTotalDoPedido);
+
+    removeItemFromBagButton = findViewById(R.id.buttonRemoverItemPedido);
+    finishOrderButton = findViewById(R.id.buttonFinalizarPedido);
+  }
+
+  private void abrirPedidoActivity() {
+    Log.i("abrirPedidoActivity", "Iniciando PedidoActivity");
+    if (itemPedido != null && itemPedido.getProduto() != null && itemPedido.getIdProdutor() != null) {
+      Intent myIntent = new Intent(getApplicationContext(), PedidoActivity.class);
+      myIntent.putExtra("objeto2", itemPedido.getProduto());
+      myIntent.putExtra("idProdutor", itemPedido.getIdProdutor());
+      myIntent.putExtra("quantidade", itemPedido.getQuantidade());
+      try {
+        startActivity(myIntent);
+        Log.i("abrirPedidoActivity", "PedidoActivity iniciada com sucesso");
+      } catch (Exception e) {
+        Log.e("abrirPedidoActivity", "Erro ao iniciar PedidoActivity: " + e.getMessage());
+        e.printStackTrace();
+      }
+    }else{
+      Log.e("abrirPedidoActivity", "Dados insuficientes para iniciar PedidoActivity");
+      // Adicione uma mensagem de log ou feedback para identificar o problema
+      Toast.makeText(ItemPedidoActivity.this, "Dados insuficientes para iniciar PedidoActivity", Toast.LENGTH_SHORT).show();
+    }
 //        startActivity(myIntent);
+  }
+
+  private void saveSelectedItemInBag(){
+
+    if(isSelectedItemInBag(produtoSelecionado.getKey())){
+      Log.d("UPDATE PRODUCT IN BAG ================ ", produtoSelecionado.getKey());
+      updateSelectedItemInBag();
+    }else{
+      Log.d("ADD PRODUCT IN BAG ================ ", produtoSelecionado.getKey());
+      addSelectedItemInBag();
     }
 
-    private void decrementarQuantidade() {
-        flag = false;
-        if(quantidade == 0){
-            Toast.makeText(ItemPedidoActivity.this,
-                    "Valor mínimo para quantidade é " + quantidadeProduto,
-                    Toast.LENGTH_SHORT).show();
-        }else{
-            quantidade-=quantidadeProduto;
-            itemPedido.setQuantidade(quantidade);
-            qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
-            calcularPrecoxQtd();
+    this.updateRemoveItemFromBagButtonVisibility();
+    this.updateSaveItemInOrderButtonLabel();
+  }
+
+  private void addSelectedItemInBag(){
+    int quantity = getSelectedItemQuantityInOrder();
+    ItemPedido orderItem = new ItemPedido();
+
+    orderItem.setIdProdutor(idProdutor);
+    orderItem.setProduto(produtoSelecionado);
+    orderItem.setQuantidade(quantity);
+    orderItem.setValorTotal(quantity * produtoSelecionado.getPreco());
+
+    orderItems.put(orderItem.getProduto().getKey(), orderItem);
+    orderItem.salvarItemPedido();
+  }
+
+  private void updateSelectedItemInBag(){
+    int quantity = getSelectedItemQuantityInOrder();
+    ItemPedido orderItem = orderItems.getOrDefault(produtoSelecionado.getKey(), null);
+
+    assert orderItem != null;
+
+    orderItem.setQuantidade(quantity);
+    orderItem.setValorTotal(quantity * produtoSelecionado.getPreco());
+
+    orderItem.atualizarItemPedido();
+  }
+
+  private void removeSelectedItemFromBag(){
+    ItemPedido orderItem = orderItems.getOrDefault(produtoSelecionado.getKey(), null);
+    assert orderItem != null;
+
+    orderItems.remove(produtoSelecionado.getKey(), orderItem);
+    orderItem.removerItemPedido();
+
+    updateActionButtonsOnChangeBag();
+  }
+
+  private boolean isSelectedItemInBag(String productId){
+    ItemPedido orderItem = orderItems.getOrDefault(productId, null);
+    return Objects.nonNull(orderItem);
+  }
+
+  private int getSelectedItemQuantityInOrder(){
+    return Integer.parseInt(qtdProdutoTextView.getText().toString());
+  }
+
+  private void decrementarQuantidade() {
+    flag = false;
+    if(quantidade == 0){
+      Toast.makeText(ItemPedidoActivity.this,
+              "Valor mínimo para quantidade é " + quantidadeProduto,
+              Toast.LENGTH_SHORT).show();
+    }else{
+      quantidade-=quantidadeProduto;
+      itemPedido.setQuantidade(quantidade);
+      qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
+      calcularPrecoxQtd();
+    }
+  }
+  private void incrementarQuantidade() {
+    flag = true;
+    quantidade+=quantidadeProduto;
+    if(quantidade < 1){
+      Toast.makeText(ItemPedidoActivity.this,
+              "Valor mínimo para quantidade é 1",
+              Toast.LENGTH_SHORT).show();
+    }else{
+      itemPedido.setQuantidade(quantidade);
+    }
+    calcularPrecoxQtd();
+    Log.i("msg", "Qtd " + itemPedido.getQuantidade());
+    qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
+  }
+
+  private void calcularValorTotal() {
+    double total = itemPedido.getValorPrecoXQtdItem();
+    Log.i("msg", "valorFinal " + total);
+    itemPedido.setValorTotal(total);
+    textViewValorTotal.setText(quantidade + " unidades por R$ " + String.valueOf(total));
+  }
+
+  private void calcularPrecoxQtd() {
+    if(flag == true){
+      qtd++;
+    }else{
+      qtd--;
+    }
+    double precoxqtd = qtd * itemPedido.getProduto().getPreco();
+    itemPedido.setValorPrecoXQtdItem(precoxqtd);
+    calcularValorTotal();
+  }
+
+  private void inicializarRecyclerViewProdutosProdutor(String idProdutor){
+    this.todosProdutos = new ArrayList<>();
+    this.produtosVisiveis = new ArrayList<>();
+
+    RecyclerView produtosRecyclerView = findViewById(R.id.listaProdutos);
+
+    LinearLayoutManager layoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
+    this.produtoProdutorAdapter = new ProducerProductAdapter(
+            this.produtosVisiveis,
+            item -> {
+              Log.d("ITEM TO HIDE =====> =", String.valueOf(item));
+              atualizarProdutosVisiveis(produtoSelecionado, item);
+              this.produtoSelecionado = item;
+              atualizarInformacoesProdutoSelecionado();
+            });
+
+    produtosRecyclerView.setLayoutManager(layoutManager);
+    produtosRecyclerView.setAdapter(this.produtoProdutorAdapter);
+
+    this.carregarProdutosProdutor(idProdutor);
+  }
+
+  public void carregarProdutosProdutor(String idProdutor) {
+    DatabaseReference produtoCollectionRef = firebaseRef.child("produto").child(idProdutor);
+
+    produtoCollectionRef.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(@NonNull DataSnapshot snapshot) {
+        for(DataSnapshot dados: snapshot.getChildren()){
+          Produto produto = dados.getValue(Produto.class);
+
+          assert produto != null;
+          produto.setKey(dados.getKey());
+
+          todosProdutos.add(produto);
+
+          if(!produtoSelecionado.getKey().equalsIgnoreCase(produto.getKey())){
+            produtosVisiveis.add(produto);
+          }
         }
-    }
-    private void incrementarQuantidade() {
-        flag = true;
-        quantidade+=quantidadeProduto;
-        if(quantidade < 1){
-            Toast.makeText(ItemPedidoActivity.this,
-                    "Valor mínimo para quantidade é 1",
-                    Toast.LENGTH_SHORT).show();
-        }else{
-            itemPedido.setQuantidade(quantidade);
-        }
-        calcularPrecoxQtd();
-            Log.i("msg", "Qtd " + itemPedido.getQuantidade());
-        qtdProdutoTextView.setText(String.valueOf(itemPedido.getQuantidade()));
-    }
 
-    private void calcularValorTotal() {
-        double total = itemPedido.getValorPrecoXQtdItem();
-        Log.i("msg", "valorFinal " + total);
-        itemPedido.setValorTotal(total);
-        textViewValorTotal.setText(quantidade + " unidades por R$ " + String.valueOf(total));
-    }
+        produtoProdutorAdapter.notifyDataSetChanged();
+      }
 
-    private void calcularPrecoxQtd() {
-        if(flag == true){
-            qtd++;
-        }else{
-            qtd--;
-        }
-        double precoxqtd = qtd * itemPedido.getProduto().getPreco();
-        itemPedido.setValorPrecoXQtdItem(precoxqtd);
-        calcularValorTotal();
-    }
+      @Override
+      public void onCancelled(@NonNull DatabaseError error) {
 
-    private void inicializarRecyclerViewProdutosProdutor(String idProdutor){
-        this.todosProdutos = new ArrayList<>();
-        this.produtosVisiveis = new ArrayList<>();
+      }
+    });
+  }
 
-        RecyclerView produtosRecyclerView = findViewById(R.id.listaProdutos);
+  private void atualizarProdutosVisiveis(Produto produtoSelecionadoAnteriormente, Produto produtoSelecionado){
+    this.produtosVisiveis.add(produtoSelecionadoAnteriormente);
+    this.produtosVisiveis.remove(produtoSelecionado);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
-        this.produtoProdutorAdapter = new ProducerProductAdapter(
-                this.produtosVisiveis,
-                item -> {
-                    Log.d("ITEM TO HIDE =====> =", String.valueOf(item));
-                    atualizarProdutosVisiveis(produtoSelecionado, item);
-                    this.produtoSelecionado = item;
-                    atualizarInformacoesProdutoSelecionado();
-                });
+    this.produtoProdutorAdapter.notifyDataSetChanged();
+  }
 
-        produtosRecyclerView.setLayoutManager(layoutManager);
-        produtosRecyclerView.setAdapter(this.produtoProdutorAdapter);
-
-        this.carregarProdutosProdutor(idProdutor);
-    }
-
-    public void carregarProdutosProdutor(String idProdutor) {
-        DatabaseReference produtoCollectionRef = firebaseRef.child("produto").child(idProdutor);
-
-        produtoCollectionRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dados: snapshot.getChildren()){
-                    Produto produto = dados.getValue(Produto.class);
-
-                    assert produto != null;
-                    produto.setKey(dados.getKey());
-
-                    todosProdutos.add(produto);
-
-                    if(!produtoSelecionado.getKey().equalsIgnoreCase(produto.getKey())){
-                        produtosVisiveis.add(produto);
-                    }
-                }
-
-                produtoProdutorAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void atualizarProdutosVisiveis(Produto produtoSelecionadoAnteriormente, Produto produtoSelecionado){
-        this.produtosVisiveis.add(produtoSelecionadoAnteriormente);
-        this.produtosVisiveis.remove(produtoSelecionado);
-
-        this.produtoProdutorAdapter.notifyDataSetChanged();
-    }
+  public void finishOrder(){
+    Intent myIntent = new Intent(getApplicationContext(), PedidoActivity.class);
+    startActivity(myIntent);
+  }
 }
